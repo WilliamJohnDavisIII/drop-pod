@@ -18,6 +18,11 @@ rodio = "0.23.0"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 
+# Linux needs winit's window backends and a file-dialog backend (macOS and Windows have theirs built in)
+[target.'cfg(target_os = "linux")'.dependencies]
+eframe = { version = "0.37", default-features = false, features = ["wgpu", "x11", "wayland"] }
+rfd = { version = "0.17.2", default-features = false, features = ["xdg-portal"] }
+
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
 objc2-foundation = { version = "0.3", default-features = false, features = ["std"] }
