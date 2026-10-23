@@ -38,6 +38,8 @@
       "depots": [],
       "runs": "mac",
       "program": "^ChupathingyCE\\.app$",
+      "windows": {"asset": "^chupathingyce-windows64-release\\.zip$", "program": "^halo\\.exe$"},
+      "linux": {"asset": "^chupathingyce-linux64-release\\.zip$", "program": "^halo$"},
       "process": "ChupathingyCE\\.app/Contents/MacOS/",
       "setup": "xbox-disc",
       "notes": [

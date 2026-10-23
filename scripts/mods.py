@@ -62,10 +62,16 @@ def version_key(name):
     return tuple(int(x) for x in re.findall(r"\d+", name))
 
 
+def here(mod, key):
+    """The catalogue's asset or program pattern for this system (its "windows"/"linux" entry, else the Mac's)."""
+    m = MODS[mod]
+    return m.get(games.PLATFORM, {}).get(key) or (m["source"]["asset"] if key == "asset" else m[key])
+
+
 def program(mod):
     """The installed program: the newest-named file in mods/<mod>/ (or the catalogue's folder within it) that the
     catalogue's pattern matches."""
-    pattern = re.compile(MODS[mod]["program"])
+    pattern = re.compile(here(mod, "program"))
     try:
         found = [p for p in (folder(mod) / MODS[mod].get("folder", "")).iterdir() if pattern.match(p.name)]
     except OSError:
@@ -152,7 +158,10 @@ def unpack(archive, dest):
                 (dest / path).parent.mkdir(parents=True, exist_ok=True)
                 with z.open(i) as src, open(dest / path, "wb") as out:
                     shutil.copyfileobj(src, out)
-    if not windows:
+    if not windows and games.PLATFORM != "mac":
+        with zipfile.ZipFile(archive) as z:
+            z.extractall(dest)  # (drops paths outside dest)
+    elif not windows:
         subprocess.run(["/usr/bin/ditto", "-x", "-k", str(archive), str(dest)], check=True)
 
 
@@ -161,10 +170,10 @@ def latest(mod):
     source = MODS[mod]["source"]
     release = json.loads(fetch(f"{API}/{source['github']}/releases/latest").decode())
     assets = {a["name"]: a for a in release.get("assets", [])}
-    pattern = re.compile(source["asset"])
+    pattern = re.compile(here(mod, "asset"))
     names = [n for n in assets if pattern.match(n)]
     if not names or ("sums" in source and source["sums"] not in assets):
-        raise RuntimeError(f"{MODS[mod]['name']}'s latest release has no download for this Mac")
+        raise RuntimeError(f"{MODS[mod]['name']}'s latest release has no download for this {'Mac' if games.PLATFORM == 'mac' else 'computer'}")
     name = names[0]
     sums = {}
     if "sums" in source:
@@ -206,10 +215,12 @@ def get(mod):
         new.replace(folder(mod))
     else:  # one program among the mod's other files (Mesa's DLLs for Project Reclaimer): older ones go
         (downloads / name).replace(folder(mod) / name)
-        pattern = re.compile(m["program"])
+        pattern = re.compile(here(mod, "program"))
         for old in folder(mod).iterdir():
             if old.name != name and pattern.match(old.name):
                 old.unlink()
+    if games.PLATFORM == "linux" and program(mod):
+        program(mod).chmod(0o755)  # (zips don't keep it executable)
     return "ok" if program(mod) else f"error: {m['name']}'s download didn't have its program in it"
 
 

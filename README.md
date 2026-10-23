@@ -33,8 +33,8 @@ Drop Pod was born on a Mac, because a Mac is all I have, so **macOS is the only 
 | | Status |
 |---|---|
 | **macOS** (Apple Silicon, macOS 14+) | Full guided setup. Halo 2 and 3 run under Wine Staging + DXVK + MoltenVK through Rosetta; Halo CE runs natively. |
-| **Windows** | The app builds and opens; the mods run natively (Reach Renaissance included). Setup is manual for now: install each project by its own instructions. |
-| **Linux** (incl. Steam Deck) | The app builds and opens; MCC runs through Steam's Proton. Setup is manual for now, as on Windows. |
+| **Windows** | Guided setup (experimental, untested); needs Python 3. The mods run natively (Reach Renaissance included). |
+| **Linux** (incl. Steam Deck) | Guided setup (experimental, untested); needs Python 3. Halo CE runs natively; the Windows mods run under your system's Wine. |
 
 **On Windows or Linux, any testing, bug report or PR is a godsend.** See [Contributing](#contributing).
 

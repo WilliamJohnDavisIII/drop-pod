@@ -387,7 +387,7 @@ impl Library {
             if self.files_found { self.present = present_depots(&folder); }
         }
         self.mods_there = mods().iter().filter(|m| {
-            let Ok(re) = regex::Regex::new(&m.program) else { return false };
+            let Ok(re) = regex::Regex::new(m.program()) else { return false };
             std::fs::read_dir(paths::home().join("mods").join(&m.id)).map(|d| d.flatten()
                 .any(|e| re.is_match(&e.file_name().to_string_lossy()))).unwrap_or(false)
         }).map(|m| m.id.clone()).collect();
@@ -559,8 +559,11 @@ impl Library {
             if self.game_app.is_none() { self.game_stopped(true); }
             return;
         }
-        self.game_process = Proc::spawn(&self.waker, "/bin/zsh",
-                                        &[paths::scripts_dir().join("play.sh").to_string_lossy().into_owned(), id.into(), engine], &[]);
+        self.game_process = if cfg!(target_os = "macos") {
+            Proc::spawn(&self.waker, "/bin/zsh", &[paths::scripts_dir().join("play.sh").to_string_lossy().into_owned(), id.into(), engine], &[])
+        } else {
+            proc::python(&self.waker, "play.py", &[id, &engine]) // (Windows, Linux: setup.py put it there)
+        };
         if self.game_process.is_none() { self.game_stopped(true); }
     }
 
@@ -1006,7 +1009,7 @@ impl Library {
         n.last.clear();
         let args: Vec<String> = ["-I", "-B"].iter().map(|s| s.to_string())
             .chain([paths::scripts_dir().join("xiso.py").to_string_lossy().into_owned(), "check".into(), path.to_string_lossy().into_owned()]).collect();
-        n.running = Proc::spawn(&self.waker, "/usr/bin/python3", &args, &[]).map(|p| (NativeTool::Check, p));
+        n.running = Proc::spawn(&self.waker, proc::PYTHON, &args, &[]).map(|p| (NativeTool::Check, p));
         if n.running.is_none() { n.checking = false; n.image_problem = Some("That file couldn't be read.".into()); }
     }
 

@@ -28,7 +28,8 @@ import games  # noqa: E402  (the depot table, next to this script)
 
 BASE = games.BASE
 ACCOUNT_FILE = BASE / "steam-account"
-DEPOT = Path(os.environ.get("DROPPOD_DEPOTDOWNLOADER", BASE / "tools" / "DepotDownloader"))
+DEPOT_EXE = "DepotDownloader.exe" if games.PLATFORM == "windows" else "DepotDownloader"
+DEPOT = Path(os.environ.get("DROPPOD_DEPOTDOWNLOADER", BASE / "tools" / DEPOT_EXE))
 APP_ID = str(games.APP_ID)
 DRY = os.environ.get("DROPPOD_DRY_RUN", "")
 PROGRESS = re.compile(r"^\s*(\d+(?:\.\d+)?)% ")

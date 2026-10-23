@@ -55,10 +55,20 @@ pub struct Mod {
     pub setup: String,   // "with-game": set up with its game (install.sh); "xbox-disc": from the player's disc
     pub extras: Option<Vec<String>>, // what install.sh adds for it: mesa, spinfix, loopback, presets
     pub not_under_wine: Option<String>, // it stops itself under Wine (Reach Renaissance): why, for the player
+    pub windows: Option<PlatformFiles>, // its download and program on Windows, when they aren't the Mac's
+    pub linux: Option<PlatformFiles>,
 }
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct PlatformFiles { pub asset: String, pub program: String }
 
 impl Mod {
     pub fn on_wine(&self) -> bool { self.runs == "wine" }
+    /// Its program's pattern on this system (mods.py picks the same).
+    pub fn program(&self) -> &str {
+        let here = if cfg!(windows) { &self.windows } else if cfg!(target_os = "linux") { &self.linux } else { &None };
+        here.as_ref().map_or(&self.program, |p| &p.program)
+    }
     /// Every Windows mod runs under Wine on the Mac, so one that stops itself there doesn't run here.
     // (Windows runs it natively, so a mod that stops itself under Wine is fine there)
     pub fn runs_here(&self) -> bool { cfg!(target_os = "windows") || !(self.on_wine() && self.not_under_wine.is_some()) }

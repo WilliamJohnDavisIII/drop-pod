@@ -144,7 +144,7 @@ step_start() {
   note "Game files: $GAME_FILES ($([ "$SOURCE" = existing ] && echo "an existing MCC folder, used in place" || echo "downloaded from Steam"))"
   note "Games: $GAMES (mods: $(echo $(printf '%s\n' "$MODS" | cut -d' ' -f1)))"
   [ -n "$DRY" ] && note "Dry run: nothing is downloaded, run in Wine or changed as admin"
-  [ "$(uname -s)" = Darwin ] || die "Automatic setup is Mac-only for now. On Windows or Linux, install each mod by its own instructions (see the README); PRs welcome."
+  [ "$(uname -s)" = Darwin ] || die "install.sh is the Mac's setup. On Windows or Linux, open the app, or run: python3 scripts/setup.py"
   [ "$(uname -m)" = arm64 ] || die "This needs an Apple Silicon Mac (M1 or newer)."
   [ "$(sw_vers -productVersion | cut -d. -f1)" -ge 14 ] || die "This needs macOS 14 Sonoma or newer."
   case "$SOURCE" in steam|existing) ;; *) die "Unknown game files source: $SOURCE" ;; esac

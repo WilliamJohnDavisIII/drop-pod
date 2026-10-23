@@ -7,7 +7,7 @@ use std::sync::OnceLock;
 
 pub fn var(name: &str) -> Option<String> { std::env::var(name).ok().filter(|v| !v.is_empty()) }
 
-pub fn user_home() -> PathBuf { PathBuf::from(var("HOME").unwrap_or_else(|| "/".into())) }
+pub fn user_home() -> PathBuf { PathBuf::from(var("HOME").or_else(|| var("USERPROFILE")).unwrap_or_else(|| "/".into())) }
 
 /// The .app this runs from (Contents/MacOS/<exe> three levels up), if it runs from one.
 pub fn bundle() -> Option<&'static Path> {
@@ -60,7 +60,11 @@ pub fn installed_app() -> PathBuf {
 }
 
 /// install.sh and its scripts travel inside the app (Contents/Resources/install); DROPPOD_INSTALLER overrides it.
+/// Off the Mac: scripts/setup.py beside the program (the release zip's layout).
 pub fn installer() -> Option<PathBuf> {
+    if !cfg!(target_os = "macos") && var("DROPPOD_INSTALLER").is_none() {
+        return Some(std::env::current_exe().ok()?.parent()?.join("scripts/setup.py"));
+    }
     var("DROPPOD_INSTALLER").map(PathBuf::from).or_else(|| bundle().map(|b| b.join("Contents/Resources/install/install.sh")))
 }
 

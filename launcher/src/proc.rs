@@ -82,19 +82,26 @@ impl Proc {
     pub fn pid(&self) -> u32 { self.pid }
 }
 
-/// `python3 -I scripts/<script> <args>`: a helper script install.sh put in $DROPPOD_HOME/scripts.
+/// The Python 3 the scripts run with (Windows: the py launcher; Linux: the one on PATH).
+pub const PYTHON: &str = if cfg!(target_os = "macos") { "/usr/bin/python3" } else if cfg!(windows) { "py" } else { "python3" };
+
+/// `python3 -I scripts/<script> <args>`: a helper script install.sh (setup.py) put in $DROPPOD_HOME/scripts.
 pub fn python(waker: &Waker, script: &str, args: &[&str]) -> Option<Proc> {
     let mut a = vec!["-I".to_string(), paths::scripts_dir().join(script).to_string_lossy().into_owned()];
     a.extend(args.iter().map(|s| s.to_string()));
-    Proc::spawn(waker, "/usr/bin/python3", &a, &[])
+    Proc::spawn(waker, PYTHON, &a, &[])
 }
 
-/// install.sh from inside the app, in GUI mode, with the given choices.
+/// install.sh (setup.py off the Mac) from inside the app, in GUI mode, with the given choices.
 pub fn installer(waker: &Waker, choices: &[(&str, String)]) -> Option<Proc> {
     let url = paths::installer().filter(|p| p.exists())?;
     let mut env: Vec<(&str, String)> = choices.to_vec();
     env.push(("DROPPOD_GUI", "1".into()));
-    Proc::spawn(waker, if cfg!(target_os = "macos") { "/bin/bash" } else { "bash" }, &[url.to_string_lossy().into_owned()], &env)
+    if cfg!(target_os = "macos") {
+        Proc::spawn(waker, "/bin/bash", &[url.to_string_lossy().into_owned()], &env)
+    } else {
+        Proc::spawn(waker, PYTHON, &["-I".into(), url.to_string_lossy().into_owned()], &env)
+    }
 }
 
 /// Does the command succeed? (Waits for it: only for quick checks.)

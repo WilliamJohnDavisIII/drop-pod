@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 (2026-10-23)
+
+**Windows and Linux (experimental, untested)**
+- A guided setup off the Mac too (`scripts/setup.py`, needs Python 3): the same steps the window shows, with
+  DepotDownloader's Windows or Linux build for the game files from your Steam account, and each chosen game's mod.
+  Nothing Mac-only (Wine, DXVK, Mesa, spinfix, local network addresses, game apps, graphics presets).
+- Play starts the mods with `scripts/play.py`: as they are on Windows, under your system's Wine on Linux (each mod
+  in its own prefix, with the game files linked where it looks; it asks you to install Wine if it's missing).
+- ChupathingyCE downloads its Windows or Linux build.
+
 ## 0.1.0 (2026-10-23)
 
 The first public release.

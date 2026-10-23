@@ -38,11 +38,14 @@ APP_ID = CATALOGUE["steamApp"]
 DEPOTS = {d["id"]: (d["name"], d["gib"], d["markers"]) for d in CATALOGUE["depots"]}
 BASE_DEPOT = CATALOGUE["baseDepot"]
 MODS = {m["id"]: m for m in CATALOGUE["mods"]}
+# windows, linux or mac (DROPPOD_PLATFORM stands in, for dry runs): a mod's "windows"/"linux" entry, when it has one,
+# gives that system's asset and program
+PLATFORM = os.environ.get("DROPPOD_PLATFORM") or {"win32": "windows", "linux": "linux"}.get(sys.platform, "mac")
 
 
 def runs_here(mod):
-    """False for a Windows mod that stops itself under Wine (notUnderWine): here every Windows mod runs under Wine."""
-    return not (MODS[mod]["runs"] == "wine" and MODS[mod].get("notUnderWine"))
+    """False for a Windows mod that stops itself under Wine (notUnderWine), except on Windows, where it runs natively."""
+    return PLATFORM == "windows" or not (MODS[mod]["runs"] == "wine" and MODS[mod].get("notUnderWine"))
 
 
 # What a game's Play button can run, the default first; a game with nothing that runs here isn't listed. The choice
