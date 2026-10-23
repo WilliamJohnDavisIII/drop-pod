@@ -1,0 +1,13 @@
+#!/bin/zsh
+# A game app's executable (<home>/game.noindex/<mod's name>.app/Contents/MacOS/launch), made by install.sh from
+# scripts/game-launch.sh.in, one per Wine mod. The library opens the mod's app through LaunchServices with the game and
+# the mod as arguments, so the running game shows as the mod (Project Reclaimer) in the menu bar, the Dock, Cmd-Tab and
+# Game Mode instead of "wine". The identity survives every exec below and Wine's own re-exec (not processes the mod
+# starts itself, which Wine starts with its own loader): play.sh runs the game with the copy of Wine's loader next to
+# this script (DROPPOD_WINE), named like the app, which finds Wine's libraries through Contents/lib and Contents/share
+# (links into the Wine install).
+# usage: launch <game> [mod]
+here=${0:A:h}
+export DROPPOD_HOME=${DROPPOD_HOME:-'@DROPPOD_HOME@'}
+export DROPPOD_WINE="$here/${here:h:h:t:r}"
+exec "$DROPPOD_HOME/scripts/play.sh" "$@"

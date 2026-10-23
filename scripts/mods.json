@@ -1,0 +1,119 @@
+{
+  "steamApp": 976730,
+  "baseDepot": 976731,
+  "depots": [
+    {"id": 976731, "name": "Shared files", "gib": 16.0,
+     "markers": ["MCC/Binaries/Win64/MCC-Win64-Shipping.exe", "Data/UI/BackgroundVideos/Images/HaloCE.png"]},
+    {"id": 976735, "name": "Halo 2 campaign", "gib": 29.1,
+     "markers": ["halo2/halo2.dll", "halo2/h2_maps_win64_dx11/01b_spacestation.map", "halo2/preload/paks/shared.pck"]},
+    {"id": 976736, "name": "Halo 2 multiplayer", "gib": 19.7,
+     "markers": ["halo2/h2_maps_win64_dx11/lockout.map"]},
+    {"id": 976738, "name": "Halo 3 campaign", "gib": 8.4, "markers": ["halo3/halo3.dll", "halo3/maps/010_jungle.map"]},
+    {"id": 976739, "name": "Halo 3 multiplayer", "gib": 8.7, "markers": ["halo3/maps/guardian.map"]},
+    {"id": 1064222, "name": "Halo 3: ODST campaign and Firefight", "gib": 8.1,
+     "markers": ["halo3odst/halo3odst.dll", "halo3odst/maps/c100.map", "halo3odst/maps/h100.map"]},
+    {"id": 1064225, "name": "Halo: Reach campaign and Firefight", "gib": 9.1,
+     "markers": ["haloreach/haloreach.dll", "haloreach/maps/m10.map", "haloreach/maps/ff10_prototype.map"]},
+    {"id": 1064226, "name": "Halo: Reach multiplayer", "gib": 7.3, "markers": ["haloreach/maps/20_sword_slayer.map"]}
+  ],
+  "games": [
+    {"id": "halo1", "title": "Halo: Combat Evolved", "short": "Halo CE", "art": "HaloCE.png", "mods": ["chupathingyce"]},
+    {"id": "halo2", "title": "Halo 2", "short": "Halo 2", "art": "Halo2.png", "mods": ["gravemind"],
+     "addons": [{"id": "halo2-mp", "name": "Multiplayer maps", "depots": [976736],
+                 "about": "Halo 2's classic multiplayer maps, for Project Gravemind's matches online, on your network and in split-screen. The campaign doesn't need them."}]},
+    {"id": "halo3", "title": "Halo 3 and ODST", "short": "Halo 3 and ODST", "art": "Halo3.png", "mods": ["reclaimer"],
+     "addons": [{"id": "halo3-odst", "name": "Halo 3: ODST", "depots": [1064222],
+                 "about": "ODST's campaign and Firefight, which Project Reclaimer plays too. A Steam DLC of its own: tick it if your Steam account has it."}]},
+    {"id": "haloreach", "title": "Halo: Reach", "short": "Reach", "art": "HaloReach.png", "mods": ["renaissance"]}
+  ],
+  "mods": [
+    {
+      "id": "chupathingyce",
+      "name": "ChupathingyCE",
+      "licence": "GPL-3.0",
+      "about": "The original Xbox Halo, rebuilt to run on the Mac itself: the whole campaign, split-screen for up to 4 on one Mac, System Link on your network and online games. It plays from your own Halo: Combat Evolved Xbox disc, not from the Steam game files.",
+      "caption": "split-screen up to 4 · from your Xbox disc",
+      "source": {"github": "ChupathingyCE/chupathingyce", "asset": "^chupathingyce-macos-release\\.zip$", "sums": "SHA256SUMS"},
+      "mb": 26,
+      "depots": [],
+      "runs": "mac",
+      "program": "^ChupathingyCE\\.app$",
+      "process": "ChupathingyCE\\.app/Contents/MacOS/",
+      "setup": "xbox-disc",
+      "notes": [
+        "players (its README, chupathingy.org and release notes, read 2026-10-22): the campaign from the disc's maps folder, split screen (the README credits a fix for three and four local players; no maximum is stated, so 4 is inferred), System Link and online games including online co-op; no co-op player count is published."
+      ]
+    },
+    {
+      "id": "gravemind",
+      "name": "Project Gravemind",
+      "licence": "closed source, its authors' terms",
+      "about": "A community-made program that runs Halo 2 from your own Steam game files, with its own Halo 2-style menus: co-op campaign for up to 6 over the internet or your network, multiplayer for up to 24, and split-screen.",
+      "caption": "co-op up to 6 · 24 in multiplayer",
+      "source": {"github": "BriRoz1/h2gravemind-releases", "asset": "^h2gravemind\\.zip$"},
+      "mb": 4,
+      "depots": [976735],
+      "mccBuild": "current",
+      "runs": "wine",
+      "program": "^h2gravemind\\.exe$",
+      "process": "h2gravemind\\.exe",
+      "setup": "with-game",
+      "notes": [
+        "players (its README, read 2026-10-22): co-op campaign for up to 6 (not said how many of them on one screen; split screen exists), online multiplayer for up to 24.",
+        "Halo 2's add-on halo2-mp (depot 976736, in Steam's \"MCC - H2: Multiplayer DLC\" with 976737, the groundhog files): its marker lockout.map is where Gravemind loads multiplayer maps from (halo2\\h2_maps_win64_dx11\\<map>.map), not yet seen in a download.",
+        "source: no checksum file; each asset's SHA-256 is on its release page (GitHub's asset digest), which mods.py checks.",
+        "Tested 2026-10-21 under Wine Staging 11.18 + DXVK-macOS 1.10.3: it needs no arguments, DLL overrides or environment of its own. It finds MCC in the prefix's Steam folder, keeps its settings, saves and logs in the prefix's Documents and AppData, and, its readme says, restarts itself after each match (the library waits for the whole Wine session)."
+      ]
+    },
+    {
+      "id": "reclaimer",
+      "name": "Project Reclaimer",
+      "licence": "closed source, its authors' terms",
+      "about": "A community-made program that runs Halo 3 and Halo 3: ODST from your own Steam game files, with its own menus: co-op campaign for up to 16 (up to 4 in split-screen on one Mac), ODST's Firefight, Forge, and multiplayer for up to 128. Nothing you have changes.",
+      "caption": "co-op up to 16 · 4 on one screen",
+      "source": {"github": "ProjectReclaimer/project-reclaimer-releases", "asset": "^project-reclaimer-(client-)?v[0-9.]+\\.exe$",
+                 "sums": "SHA256SUMS.txt"},
+      "mb": 45,
+      "depots": [976738, 976739],
+      "mccBuild": "current",
+      "runs": "wine",
+      "program": "^project-reclaimer-(client-)?v[0-9.]+\\.exe$",
+      "process": "project-reclaimer-(client-)?v[0-9.]+\\.exe",
+      "args": ["game-client", "--mcc-path", "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo The Master Chief Collection"],
+      "dllOverrides": "opengl32=n,b;xaudio2_9=d",
+      "env": {"GALLIUM_DRIVER": "llvmpipe", "LP_NUM_THREADS": "0"},
+      "extras": ["mesa", "spinfix", "loopback", "presets"],
+      "setup": "with-game",
+      "notes": [
+        "players (projectreclaimer.dev and play.html, read 2026-10-22): co-op campaign up to 16, split-screen players counting toward it, up to 4 in split screen on one PC; up to 128 in a hosted multiplayer game. ODST since 0.9.19: its eleven missions and Firefight, from one Steam DLC (app 1064272, depot 1064222), optional (the halo3-odst add-on); Halo 3's campaign and multiplayer files are required.",
+        "dllOverrides: opengl32=n,b is Mesa's opengl32.dll beside the exe (extra mesa): its menu needs OpenGL 3.0+, which Wine on macOS only gives core-profile apps. xaudio2_9=d: MCC's xaudio2_9redist.dll forwards to the inbox xaudio2_9 on Windows 10, i.e. Wine's FAudio, which crashes mid-match and sounds poor; disabled, Microsoft's own mixer stays.",
+        "env: GALLIUM_DRIVER=llvmpipe is Mesa's software renderer; it redraws the menu layer every frame, and LP_NUM_THREADS=0 stops its worker threads each pinning a core (menu idle about 440% CPU down to about 250%).",
+        "extras: spinfix is the d3d11.dll shim in the prefix (spinfix/spinfix.c); loopback the local network addresses it binds (127.0.0-3.x, 127.3.1-3.x); presets its tuned graphics settings (presets.py)."
+      ]
+    },
+    {
+      "id": "renaissance",
+      "name": "Reach Renaissance",
+      "licence": "closed source, its authors' terms",
+      "about": "A community-made program that runs Halo: Reach from your own Steam game files, with the Xbox 360 menus: multiplayer over the internet with a public server list, Firefight and the campaign.",
+      "caption": "online campaign, Firefight and multiplayer",
+      "source": {"github": "NETF1ix/reach-renaissance-releases", "asset": "^ReachRenaissance-v[0-9.]+\\.zip$", "sums": "SHA256SUMS.txt"},
+      "mb": 443,
+      "depots": [1064225, 1064226],
+      "mccBuild": "current",
+      "runs": "wine",
+      "folder": "ReachRenaissance",
+      "program": "^Reach Renaissance\\.exe$",
+      "process": "Reach Renaissance\\.exe",
+      "setup": "with-game",
+      "notUnderWine": "Reach Renaissance doesn't run on this computer yet: it stops itself when it finds Wine, the layer that runs Windows programs here. Its authors may change that in an update.",
+      "notes": [
+        "players: its README and release notes (0.1.8 to 0.1.19, read 2026-10-22) give no player counts and don't mention split screen.",
+        "notUnderWine: under Wine (the Mac, and Linux later) the game is shown with this message and can't be set up or played; where the mod runs natively (Windows) it plays. Reach Renaissance 0.1.19 checks ntdll's wine_get_version at start and quits (tested 2026-10-22 under Wine Staging 11.18 + DXVK-macOS 1.10.3). The user's decision of 2026-10-22: PLAN.md phase G.",
+        "source: SHA256SUMS.txt is signed (SHA256SUMS.txt.sig, the project's key, which its own updater checks); some releases also have MANIFEST.txt and Changes-v<new>-from-v<old>.zip patches for that updater. The zip holds one folder, ReachRenaissance, with its paths written with backslashes (mods.py unpacks those itself; ditto keeps them in the names).",
+        "depots: 1064226 holds the multiplayer maps (20_sword_slayer.map is only there) and copies of files 1064225 also has; both are needed: multiplayer is most of what it plays.",
+        "Not yet in install.sh: the WebView2 runtime its menus need (Microsoft's x64 standalone installer, /silent /install; Windows 8 for msedgewebview2.exe only, HKCU\\Software\\Wine\\AppDefaults\\msedgewebview2.exe Version=win8)."
+      ]
+    }
+  ]
+}

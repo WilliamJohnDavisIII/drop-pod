@@ -1,0 +1,39 @@
+name: build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, name: macos, exe: droppod }
+          - { os: windows-latest, name: windows, exe: droppod.exe }
+          - { os: ubuntu-latest, name: linux, exe: droppod }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - if: matrix.name == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config
+      - run: cargo build --release
+        working-directory: launcher
+      - name: package
+        shell: bash
+        run: |
+          mkdir -p "Drop-Pod-${{ matrix.name }}"
+          cp "launcher/target/release/${{ matrix.exe }}" install.sh README.md LICENSE* THIRD_PARTY_NOTICES CREDITS.md VERSION APP_NAME "Drop-Pod-${{ matrix.name }}/"
+          cp -r scripts "Drop-Pod-${{ matrix.name }}/"
+          7z a "Drop-Pod-${{ matrix.name }}.zip" "Drop-Pod-${{ matrix.name }}" >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Drop-Pod-${{ matrix.name }}
+          path: Drop-Pod-${{ matrix.name }}.zip
+      - if: startsWith(github.ref, 'refs/tags/v') && matrix.name != 'macos'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Drop-Pod-${{ matrix.name }}.zip
