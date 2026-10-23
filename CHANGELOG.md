@@ -9,6 +9,7 @@
 - Play starts the mods with `scripts/play.py`: as they are on Windows, under your system's Wine on Linux (each mod
   in its own prefix, with the game files linked where it looks; it asks you to install Wine if it's missing).
 - ChupathingyCE downloads its Windows or Linux build.
+- Drop Pod's icon on Windows (exe, taskbar) and Linux (app menu, taskbar).
 
 ## 0.1.0 (2026-10-23)
 

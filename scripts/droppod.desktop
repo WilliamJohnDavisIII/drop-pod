@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Drop Pod
+Exec=droppod
+Icon=droppod
+Categories=Game;
+Terminal=false

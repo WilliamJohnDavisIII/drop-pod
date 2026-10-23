@@ -28,6 +28,7 @@ jobs:
           mkdir -p "Drop-Pod-${{ matrix.name }}"
           cp "launcher/target/release/${{ matrix.exe }}" install.sh README.md LICENSE* THIRD_PARTY_NOTICES CREDITS.md VERSION APP_NAME "Drop-Pod-${{ matrix.name }}/"
           cp -r scripts "Drop-Pod-${{ matrix.name }}/"
+          if [ "${{ matrix.name }}" = linux ]; then cp launcher/assets/icon-256.png "Drop-Pod-linux/scripts/droppod.png"; fi
           7z a "Drop-Pod-${{ matrix.name }}.zip" "Drop-Pod-${{ matrix.name }}" >/dev/null
       - uses: actions/upload-artifact@v4
         with:

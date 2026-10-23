@@ -230,6 +230,20 @@ def step_config():
     note(str(CONFIG))
 
 
+def menu_entry():
+    """Linux: Drop Pod in the app menu (tools.py uninstall removes both files)."""
+    share = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
+    icon, desktop = HERE / "droppod.png", HERE / "droppod.desktop"
+    if not (icon.is_file() and desktop.is_file()):
+        return
+    (share / "icons/hicolor/256x256/apps").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(icon, share / "icons/hicolor/256x256/apps/droppod.png")
+    (share / "applications").mkdir(parents=True, exist_ok=True)
+    exe = (HERE.parent / "droppod").resolve()
+    (share / "applications/droppod.desktop").write_text(
+        desktop.read_text().replace("Exec=droppod", f'Exec="{exe}"'))
+
+
 def step_finish():
     if DRY:
         bold("Done (dry run)")
@@ -244,6 +258,8 @@ def step_finish():
     if UPDATE:
         bold(f"Updated to {(BASE / 'version').read_text().strip()}")
         return
+    if games.PLATFORM == "linux":
+        menu_entry()
     bold("Done")
     note(f"Open {NAME} and press Play on a game.")
 

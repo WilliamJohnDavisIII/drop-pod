@@ -376,6 +376,10 @@ def uninstall(delete_game_files=False):
         shutil.rmtree(folder, ignore_errors=True)
     shutil.rmtree(APP, ignore_errors=True)
     shutil.rmtree(BASE, ignore_errors=True)
+    if sys.platform == "linux":  # setup.py's app-menu entry
+        share = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
+        (share / "applications/droppod.desktop").unlink(missing_ok=True)
+        (share / "icons/hicolor/256x256/apps/droppod.png").unlink(missing_ok=True)
     if not os.environ.get("DROPPOD_KEEP_NETWORK") and INSTALLED_PLIST.exists():
         removed = as_admin(f"launchctl bootout system/{DAEMON} 2>/dev/null; rm -f {DAEMON_PLIST}; "
                            f"rm -rf {quoted(DAEMON_DIR)}", f"{NAME} is removing its network setting.")
