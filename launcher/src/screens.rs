@@ -161,7 +161,7 @@ impl App {
     fn subtitle(&self) -> String {
         if let Some(id) = &self.lib.playing { return format!("Playing {}. Quit the game to come back here.", Library::title_of(id)); }
         if self.lib.getting().is_some() { return "Downloading a game. You can play the others meanwhile.".into(); }
-        "Community-made ways to play the Halo campaigns on your Mac".into()
+        "Community-made Halo, set up from one window".into()
     }
 
     /// Updates, and the Halo 3 network setup or a stuck controller service when there's something to say.
@@ -607,7 +607,7 @@ impl App {
         let s = &self.setup;
         let n = app_name();
         let subtitle = match s.page {
-            Page::Checks => "Let's get the Halo campaigns running on your Mac",
+            Page::Checks => "Let's get Halo running",
             Page::Games => "Step 2 of 3: which games?",
             Page::Files => "Step 3 of 3: where are the game files?",
             _ => "Setting up",
