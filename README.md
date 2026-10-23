@@ -15,12 +15,12 @@ message follow it on the next build.)*
 
 | Game | Plays with | From |
 |---|---|---|
-| Halo: Combat Evolved | **[ChupathingyCE](https://github.com/ChupathingyCE/chupathingyce)**, a native port: a Mac app of its own | your own original Xbox disc, as a disc image |
-| Halo 2 | **[Project Gravemind](https://github.com/BriRoz1/h2gravemind-releases)**, with Halo 2-style menus, co-op campaign for up to 6 over the internet or your network, and split-screen | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 29.1 GB campaign, + 19.7 GB multiplayer maps if you tick them |
-| Halo 3 | **[Project Reclaimer](https://github.com/ProjectReclaimer/project-reclaimer-releases)**, with its own menus, Forge and split-screen for up to 4 | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 8.4 GB campaign + 8.7 GB multiplayer |
+| Halo: Combat Evolved | **[ChupathingyCE](https://github.com/ChupathingyCE/chupathingyce)**, a native port of the original Xbox Halo for Mac, Windows and Linux: the whole campaign, split-screen for up to 4, System Link on your network and online games | your own original Xbox disc, as a disc image |
+| Halo 2 | **[Project Gravemind](https://github.com/BriRoz1/h2gravemind-releases)**, with Halo 2-style menus: co-op campaign for up to 6 over the internet or your network, multiplayer for up to 24, and split-screen | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 29.1 GB campaign, + 19.7 GB multiplayer maps if you tick them |
+| Halo 3 and ODST | **[Project Reclaimer](https://github.com/ProjectReclaimer/project-reclaimer-releases)**, with its own menus: co-op campaign for up to 16 (up to 4 in split-screen on one computer), multiplayer for up to 128 with dedicated servers and a server browser, Forge, and ODST's Firefight | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 8.4 GB campaign + 8.7 GB multiplayer |
 | Halo: Reach | **Reach Renaissance**, with the Xbox 360 menus: online multiplayer with a public server list, Firefight and the campaign (Windows only: it stops itself under Wine, so not on Mac or Linux) | your Steam copy of Halo: The Master Chief Collection |
 
-Project Gravemind and Project Reclaimer run under Wine Staging 11.18 + DXVK-macOS 1.10.3 + MoltenVK 1.4.2 (Direct3D 11 → Vulkan →
+On Windows these programs run natively. On a Mac, Project Gravemind and Project Reclaimer run under Wine Staging 11.18 + DXVK-macOS 1.10.3 + MoltenVK 1.4.2 (Direct3D 11 → Vulkan →
 Metal), through Rosetta. Drop Pod only downloads, sets up and starts each community program (each then updates
 itself); it never includes game files. The games and their mods are listed in one file, the mod catalogue
 (`scripts/mods.json`). Drop Pod is forked from the MIT-licensed
