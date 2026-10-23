@@ -1,3 +1,4 @@
+/* From the Project Reclaimer Mac port by Matt Romano (MIT; see LICENSE.reclaimer-mac-port). */
 /* d3d11.dll proxy for Project Reclaimer on macOS (Wine + DXVK).
  *
  * Halo 3's engine thread waits for its next frame by polling QueryPerformanceCounter() in a tight loop (~40,000

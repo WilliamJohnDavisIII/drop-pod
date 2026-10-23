@@ -4,6 +4,8 @@ Drop Pod stands on other people's work. Most of it is **downloaded by the instal
 releases** at install time, checked against a pinned SHA-256, and never bundled in this app. What *is* inside
 the app is listed under "In the app".
 
+Drop Pod's full source code: https://github.com/WilliamJohnDavisIII/drop-pod
+
 ## In the app
 
 | What | Licence | Notes |

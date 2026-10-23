@@ -1,3 +1,4 @@
+; From the Project Reclaimer Mac port by Matt Romano (MIT; see LICENSE.reclaimer-mac-port).
 LIBRARY d3d11.dll
 EXPORTS
     D3D11CoreCreateDevice=d3d11_dxvk.D3D11CoreCreateDevice @18

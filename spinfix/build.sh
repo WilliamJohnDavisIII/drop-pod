@@ -1,4 +1,5 @@
 #!/bin/bash
+# From the Project Reclaimer Mac port by Matt Romano (MIT; see LICENSE.reclaimer-mac-port).
 # Rebuild spinfix/d3d11.dll (needs the free mingw-w64 cross-compiler: `brew install mingw-w64`).
 set -euo pipefail
 cd "$(dirname "$0")"

@@ -56,8 +56,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSArchitecturePriority</key><array><string>arm64</string></array>
   <key>NSHighResolutionCapable</key><true/>
   <key>LSApplicationCategoryType</key><string>public.app-category.games</string>
-  <key>NSHumanReadableCopyright</key><string>GPL-3.0-or-later (the window), MIT (the scripts). Halo is a trademark of Microsoft; this app is not affiliated with Microsoft, 343 Industries or Valve.</string>
-  <key>DropPodRepo</key><string>${DROPPOD_REPO:-}</string>
+  <key>NSHumanReadableCopyright</key><string>GPL-3.0-or-later (portions MIT, see LICENSE.reclaimer-mac-port). Halo is a trademark of Microsoft; this app is not affiliated with Microsoft, 343 Industries or Valve.</string>
+  <key>DropPodRepo</key><string>${DROPPOD_REPO:-WilliamJohnDavisIII/drop-pod}</string>
 </dict>
 </plist>
 PLIST

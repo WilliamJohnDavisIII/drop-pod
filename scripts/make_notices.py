@@ -66,6 +66,9 @@ def main():
             "    Copyright 2011 The Michroma Project Authors (https://github.com/googlefonts/Michroma-font)",
             "  Titillium Web (launcher/assets/fonts/TitilliumWeb-Regular.ttf, -SemiBold.ttf): SIL Open Font License 1.1.",
             "    Copyright (c) 2009-2011 by Accademia di Belle Arti di Urbino and students of MA course of Visual design.",
+            "", "SPINFIX", "",
+            "  spinfix/d3d11.dll, built from spinfix/spinfix.c: from the Project Reclaimer Mac port, MIT.",
+            "    Copyright (c) 2026 Matt Romano (LICENSE.reclaimer-mac-port)",
             "", "", "LICENCE TEXTS", "",
             "Each text below once, with the crates that ship it.", ""]
     by_text = {}
