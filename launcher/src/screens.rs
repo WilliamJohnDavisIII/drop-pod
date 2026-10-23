@@ -378,7 +378,7 @@ impl App {
             }
             Some(Sheet::Disc) => {
                 title(&p, Rect::from_min_size(r.min - Vec2::new(0.0, 6.0), r.size()), "SET UP NATIVE HALO CE",
-                      "The original Xbox Halo, rebuilt to run on the Mac itself, with split-screen.");
+                      "The original Xbox Halo, rebuilt to run natively, with split-screen.");
                 let rows = self.disc_rows(&ui.ctx().clone());
                 let chosen = list(ui, "disc", inner, &rows, &nav, None);
                 if back && self.lib.native.page != NativePage::Working { sound::play(Sound::Back); return self.lib.close_sheet(); }
@@ -718,7 +718,7 @@ impl App {
                     let disc_chosen = s.chosen.iter().any(|g| game(g).and_then(|g| g.options.first()).is_some_and(|m| m.setup == "xbox-disc"));
                     rows.push(Row::Item { icon: Icon::Info, color: CYAN,
                         text: format!("**{}**", if disc_chosen { "Next: your Halo CE disc" } else { "Optional: native Halo CE" }),
-                        detail: "The original Xbox Halo, rebuilt to run on the Mac itself, with split-screen. It needs a disc image of your own Halo: Combat Evolved Xbox disc. You can also do this later from the Halo CE tile.".into(),
+                        detail: "The original Xbox Halo, rebuilt to run natively, with split-screen. It needs a disc image of your own Halo: Combat Evolved Xbox disc. You can also do this later from the Halo CE tile.".into(),
                         note: String::new() });
                     rows.push(Row::Gap(6.0));
                     rows.push(Row::action("Open my games", true, Id::OpenGames));

@@ -31,7 +31,7 @@
       "id": "chupathingyce",
       "name": "ChupathingyCE",
       "licence": "GPL-3.0",
-      "about": "The original Xbox Halo, rebuilt to run natively on Mac, Windows and Linux: the whole campaign, split-screen for up to 4 on one computer, System Link on your network and online games. It plays from your own Halo: Combat Evolved Xbox disc, not from the Steam game files.",
+      "about": "The original Xbox Halo, rebuilt to run natively on Mac, Windows and Linux: the whole campaign, split-screen (3 and 4 players on one screen fixed in its latest builds), System Link on your network and online games. It plays from your own Halo: Combat Evolved Xbox disc, not from the Steam game files.",
       "caption": "split-screen up to 4 · from your Xbox disc",
       "source": {"github": "ChupathingyCE/chupathingyce", "asset": "^chupathingyce-macos-release\\.zip$", "sums": "SHA256SUMS"},
       "mb": 26,

@@ -1,7 +1,8 @@
 # Drop Pod
 
-Drop Pod sets up **community-made ways to play the Halo campaigns**, with split-screen co-op, on **macOS, Windows
-and Linux**. It's one app that sets everything up from a window, with no Terminal: the community program, anything
+Drop Pod sets up **community-made Halo programs** on **macOS, Windows and Linux**: fan launchers that run Halo 2,
+Halo 3, ODST and Reach from your own copy of the Master Chief Collection on Steam, with online and LAN co-op, bigger
+multiplayer, Forge, Firefight and split-screen, plus a native port of the original Xbox Halo. It's one app that sets everything up from a window, with no Terminal: the community program, anything
 it needs to run and your own game files, each through a guided setup.
 
 > **Platforms.** Drop Pod was born on a Mac, because a Mac is all I have, so macOS is the only platform it has been
@@ -16,7 +17,7 @@ message follow it on the next build.)*
 | Game | Plays with | From |
 |---|---|---|
 | Halo: Combat Evolved | **[ChupathingyCE](https://github.com/ChupathingyCE/chupathingyce)**, a native port of the Halo: CE decompilation for Windows, Mac, Linux (Steam Deck too) and Android: the campaign with online co-op, split-screen, System Link, and online games with a server browser | your own original Xbox disc, as a disc image |
-| Halo 2 | **[Project Gravemind](https://briroz1.github.io/project-gravemind/)**: co-op campaign for up to 6, multiplayer for up to 24 with matchmaking, ranked playlists, parties and a game browser, dedicated servers, and Steam Workshop mods downloaded as you join | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 29.1 GB campaign, + 19.7 GB multiplayer maps if you tick them |
+| Halo 2 | **[Project Gravemind](https://briroz1.github.io/project-gravemind/)**: co-op campaign for up to 6, multiplayer for up to 24 with matchmaking, ranked playlists, parties and a game browser, dedicated servers, split-screen, and Steam Workshop mods downloaded as you join | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 29.1 GB campaign, + 19.7 GB multiplayer maps if you tick them |
 | Halo 3 and ODST | **[Project Reclaimer](https://github.com/ProjectReclaimer/project-reclaimer-releases)**, with its own menus: co-op campaign for up to 16 (up to 4 in split-screen on one computer), multiplayer for up to 128 with dedicated servers and a server browser, Forge, and ODST's Firefight | your Steam copy of Halo: The Master Chief Collection: 16.0 GB shared + 8.4 GB campaign + 8.7 GB multiplayer |
 | Halo: Reach | **[Reach Renaissance](https://github.com/NETF1ix/reach-renaissance-releases)**, with the Xbox 360 menus: the campaign, Firefight, and multiplayer online or on your network through a public server list (Windows 10 or 11 only; it stops itself under Wine, so not on Mac or Linux) | your Steam copy of Halo: The Master Chief Collection (not the Microsoft Store / Game Pass version) |
 
