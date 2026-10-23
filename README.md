@@ -202,6 +202,11 @@ published). For checking the window: `DROPPOD_TEST_STEPS="wait 1; down; accept; 
 says when its first frame is on screen, `DROPPOD_BENCH=1` times its frames while the menus move, `DROPPOD_SOUNDS=0`
 silences the menu sounds, and `DROPPOD_STAY=1` keeps a copy outside Applications on to the library after setup.
 
+## Licence
+
+Drop Pod is free software under the GNU GPL, version 3 or later (`LICENSE`). Portions from the Project Reclaimer
+Mac port are MIT (`LICENSE.reclaimer-mac-port`).
+
 ## Credits
 
 Forked from the [Project Reclaimer Mac Port](https://github.com/mattromano/project-reclaimer-mac-port) by Matt

@@ -1,7 +1,7 @@
 THIRD-PARTY NOTICES: Drop Pod's window (launcher/)
 
 The window is written in Rust and is free software under the GNU General Public License, version 3 or
-later (launcher/LICENSE.GPL); parts ported from the Project Reclaimer Mac port stay MIT
+later (LICENSE); parts ported from the Project Reclaimer Mac port stay MIT
 (LICENSE.reclaimer-mac-port). It is compiled from the crates below, each under its own licence, and
 contains the two fonts after them. Nothing of Halo's, MCC's or Bungie's is in it: the pictures behind
 the menus are read at run time from the player's own game files, and the menu sounds are made in code.

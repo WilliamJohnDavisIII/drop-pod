@@ -8,10 +8,10 @@ the app is listed under "In the app".
 
 | What | Licence | Notes |
 |---|---|---|
-| **Drop Pod's window** (`launcher/`, in Rust) | GPL-3.0-or-later (`launcher/LICENSE.GPL`) | The parts ported from the Reclaimer Mac port's window stay MIT (marked in their files' headers). |
-| **Drop Pod's installer and scripts** (`install.sh`, `scripts/`, including `xiso.py`, written for it from the Xbox disc format) | MIT (`LICENSE`) | |
+| **Drop Pod's window** (`launcher/`, in Rust) | GPL-3.0-or-later (`LICENSE`) | The parts ported from the Reclaimer Mac port's window stay MIT (marked in their files' headers). |
+| **Drop Pod's installer and scripts** (`install.sh`, `scripts/`, including `xiso.py`, written for it from the Xbox disc format) | GPL-3.0-or-later (`LICENSE`) | |
 | **The Rust crates and fonts the window is built from** (egui, eframe, wgpu, gilrs, rodio and the crates they use; Michroma and Titillium Web) | Each its own: MIT, Apache-2.0, MPL-2.0, Zlib, BSD, ISC; the fonts SIL OFL 1.1 | Every one, with its licence text, in `THIRD_PARTY_NOTICES`. |
-| **Drop Pod's icon** (`assets/icon/`: `make_icon.py` and `tools/` draw it in code) | MIT (`LICENSE`) | Original geometry: no fonts, game art or traced shapes. |
+| **Drop Pod's icon** (`assets/icon/`: `make_icon.py` and `tools/` draw it in code) | GPL-3.0-or-later (`LICENSE`) | Original geometry: no fonts, game art or traced shapes. |
 | **Project Reclaimer Mac Port** by Matt Romano, [mattromano/project-reclaimer-mac-port](https://github.com/mattromano/project-reclaimer-mac-port) | MIT (`LICENSE.reclaimer-mac-port`) | Drop Pod is forked from it: the window's code, `install.sh`, the updater, the Steam QR sign-in relay, the Tools/Settings scripts, the "Open Anyway" guide, the DMG scripts and the Halo 3 setup (run script, graphics presets, network addresses). |
 | **spinfix** `d3d11.dll` (from the Reclaimer Mac port, `spinfix/`) | MIT | Built from `spinfix/spinfix.c`; stops Halo 3's engine thread spinning a CPU core between frames. |
 

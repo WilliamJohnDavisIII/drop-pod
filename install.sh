@@ -6,7 +6,7 @@
 # own Xbox disc (imported from the library). Only what the chosen games' mods need is installed: Halo CE alone needs
 # no Wine and no Steam download.
 # The app's window runs this (DROPPOD_GUI=1) and shows its steps; it also works from Terminal. Safe to re-run: finished
-# steps are skipped. Forked from the Project Reclaimer Mac port's install.sh (MIT, see LICENSE).
+# steps are skipped. Forked from the Project Reclaimer Mac port's install.sh (MIT, see LICENSE.reclaimer-mac-port).
 #
 # Everything lives in ~/Library/Application Support/<name> (DROPPOD_HOME), except the game files (DROPPOD_GAME_FILES).
 # Options (environment variables; the window sets them, re-runs fall back to config.json):

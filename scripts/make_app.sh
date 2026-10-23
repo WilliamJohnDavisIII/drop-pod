@@ -30,7 +30,7 @@ mkdir -p "$APP/Contents/MacOS" "$RES/install/scripts" "$RES/install/spinfix"
 cp "$TARGET/aarch64-apple-darwin/release/droppod" "$APP/Contents/MacOS/DropPod"
 
 cp assets/icon/Droppod.icns "$RES/AppIcon.icns"  # (install.sh gives the game app the same icon)
-cp LICENSE launcher/LICENSE.GPL CREDITS.md THIRD_PARTY_NOTICES "$RES/"
+cp LICENSE LICENSE.reclaimer-mac-port CREDITS.md THIRD_PARTY_NOTICES "$RES/"
 # install.sh and everything it installs: the app runs it for setup, Get, Repair and after updating itself
 cp install.sh VERSION APP_NAME "$RES/install/"
 for f in mods.json games.py mods.py steam.py updater.py tools.py presets.py xiso.py play.sh run_wine.sh \
