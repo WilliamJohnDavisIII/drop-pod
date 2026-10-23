@@ -7,6 +7,9 @@ macOS · Windows · Linux &nbsp;·&nbsp; free and open source (GPL-3.0)</p>
 
 <p align="center"><img src="docs/screenshots/main-menu.png" width="820" alt="Drop Pod's main menu"></p>
 
+<p align="center"><sub>Screenshots shown without game art. In the app, each game's tile and the menu backgrounds show
+MCC's own artwork, read from your Master Chief Collection game files once Drop Pod finds or downloads them.</sub></p>
+
 Drop Pod finds, installs and launches the fan projects that run Halo 2, Halo 3, ODST and Reach from **your own Steam
 copy of Halo: The Master Chief Collection**, and the native port of the original Xbox Halo from **your own disc**.
 No Terminal, no hunting for downloads: pick your games, scan a QR code with Steam on your phone, press Play. Each
