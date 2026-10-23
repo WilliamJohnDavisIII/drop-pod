@@ -26,6 +26,15 @@ project downloads from its own releases and keeps itself updated. Drop Pod never
 
 <p align="center"><img src="docs/screenshots/library.png" width="820" alt="Choosing a game in the library"></p>
 
+## Other ways to play
+
+| Project | What it is | Runs on |
+|---|---|---|
+| **[HCEMobile](https://hcemobile.com/)** | Halo: Combat Evolved, rebuilt from its decompilation to run in your browser, from your own Xbox disc image | A web browser, including on iPhone, iPad and Android phones |
+| **[HaloPad](https://github.com/chrissotraidis/projectreach)** (the projectreach repo) | Halo: Combat Evolved from your own Xbox disc image, plus Halo Custom Edition's community servers; you build the app yourself, and it's a preview | iPhone and iPad (iOS 17.4 or newer), Apple Silicon Macs (macOS 14.4 or newer) |
+
+Neither is part of Drop Pod: it doesn't install, launch or update them. HaloPad (Project Reach) is untested.
+
 ## Platforms
 
 Drop Pod was born on a Mac, because a Mac is all I have, so **macOS is the only platform it has been tested on**.

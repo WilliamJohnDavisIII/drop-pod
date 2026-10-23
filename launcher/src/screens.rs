@@ -274,7 +274,7 @@ impl App {
                 TileState::Playing => Some(("PLAYING".into(), OK)),
                 TileState::NeedsSetup => Some(("NOT SET UP".into(), WARN)),
                 TileState::Unavailable => Some(("FILES NOT FOUND".into(), WARN)),
-                TileState::NotHere => Some(("NOT ON THIS MAC YET".into(), DIM)),
+                TileState::NotHere => Some((format!("NOT ON THIS {} YET", COMPUTER.to_uppercase()), DIM)),
                 TileState::Ready => None,
             };
             if let Some((t, color)) = tag {
@@ -303,7 +303,7 @@ impl App {
             TileState::Playing => "Quit the game to come back".into(),
             TileState::Unavailable => "Game files not found".into(),
             TileState::NeedsSetup => format!("{}  ·  not set up yet", engine.map_or("Its mod", |m| m.name.as_str())),
-            TileState::NotHere => format!("{}  ·  not on this Mac yet", engine.map_or("Its mod", |m| m.name.as_str())),
+            TileState::NotHere => format!("{}  ·  not on this {COMPUTER} yet", engine.map_or("Its mod", |m| m.name.as_str())),
         };
         text(&p, Pos2::new(cx, top + 38.0), Align2::CENTER_CENTER, &caption.to_uppercase(), bold(15.0), CYAN, 3.0);
         let selected = g.options.iter().find(|o| Some(&o.id) == engine.map(|m| &m.id)).or(g.options.first());
@@ -398,7 +398,7 @@ impl App {
                 let Some(run) = &self.lib.run else { return };
                 let name = game(&run.purpose).map_or("the game".to_string(), |g| g.title.clone());
                 title(&p, Rect::from_min_size(r.min - Vec2::new(0.0, 6.0), r.size()), "SIGN IN TO STEAM",
-                      &format!("To download {name}. It downloads from your own Steam account. You only do this once: Steam remembers this Mac."));
+                      &format!("To download {name}. It downloads from your own Steam account. You only do this once: Steam remembers this {COMPUTER}."));
                 let ctx = ui.ctx().clone();
                 let qr = run.qr.clone();
                 let rows = vec![Row::Gap(16.0), qr_row(&ctx, qr), Row::Gap(24.0), Row::action("Stop download", true, Id::Stop)];
@@ -429,7 +429,7 @@ impl App {
         rows.push(Row::Tool {
             title: l.config.as_ref().map_or("Not set up yet".into(), |c| paths::tilde(std::path::Path::new(&c.game_files))),
             detail: if l.files_found { format!("{} free there. {source}", gigabytes(s.free_bytes)) } else { "That folder isn't there right now. Is its drive connected?".into() },
-            button: "Show in Finder".into(), enabled: l.files_found, indent: false, id: Id::ShowFiles,
+            button: if cfg!(target_os = "macos") { "Show in Finder" } else { "Show Folder" }.into(), enabled: l.files_found, indent: false, id: Id::ShowFiles,
         });
         for a in games().iter().flat_map(|g| &g.addons).filter(|a| l.missing(a)) {
             rows.push(tool(format!("{} {}", game(&a.game).map_or("", |g| g.short.as_str()), a.name.to_lowercase()),
@@ -450,10 +450,10 @@ impl App {
         }
         rows.push(tool("Use a different Steam account".into(), "Switch…", "Forgets the Steam account used for downloads; the next download shows a new QR code.", Id::Steam));
         rows.push(Row::Header("Logs".into()));
-        rows.push(tool("Show the logs".into(), "Show", "Each game's last session and the installer's messages, in a Finder window.", Id::Logs));
+        rows.push(tool("Show the logs".into(), "Show", if cfg!(target_os = "macos") { "Each game's last session and the installer's messages, in a Finder window." } else { "Each game's last session and the installer's messages, in a folder window." }, Id::Logs));
         rows.push(tool("Make a report".into(), "Make Report", "Puts the logs in a zip file on your Desktop to send to whoever set this up for you. It doesn't include your Steam account.", Id::Report));
         rows.push(Row::Header("Remove".into()));
-        rows.push(tool(format!("Uninstall {n}"), "Uninstall…", "Removes the app, the Windows layer, the mods, the games' crash reports and the network setting from this Mac. Your game files stay unless you choose otherwise. Your Steam account isn't affected.", Id::Uninstall));
+        rows.push(tool(format!("Uninstall {n}"), "Uninstall…", &format!("Removes the app, the Windows layer, the mods, the games' crash reports{} from this {COMPUTER}. Your game files stay unless you choose otherwise. Your Steam account isn't affected.", if cfg!(target_os = "macos") { " and the network setting" } else { "" }), Id::Uninstall));
         rows.push(Row::Gap(10.0));
         rows.push(Row::Text { text: format!("{n} {}", paths::app_version()), color: FAINT, size: 13.0, center: false });
         rows.push(Row::action("Done", true, Id::Done));
@@ -489,7 +489,7 @@ impl App {
             rows.push(Row::Gap(8.0));
             match &run.phase {
                 Phase::Running => {
-                    rows.push(Row::note("Keep this open. You can use your Mac meanwhile."));
+                    rows.push(Row::note(format!("Keep this open. You can use your {COMPUTER} meanwhile.")));
                     rows.push(Row::action("Stop", true, Id::Stop));
                 }
                 Phase::Failed(e) => {
@@ -551,7 +551,7 @@ impl App {
                 }
                 rows.push(Row::Gap(6.0));
                 if l.native_maps_there() {
-                    rows.push(Row::item(Icon::Ok, OK, "Halo's maps are already on this Mac, from an earlier setup: no disc image needed."));
+                    rows.push(Row::item(Icon::Ok, OK, format!("Halo's maps are already on this {COMPUTER}, from an earlier setup: no disc image needed.")));
                 } else {
                     rows.push(Row::Tool {
                         title: s.image.as_ref().and_then(|i| i.file_name()).map_or("No disc image chosen yet".into(), |n| n.to_string_lossy().into_owned()),
@@ -644,7 +644,7 @@ impl App {
                             Some(why) => why.clone(),
                             None => g.options.first().map_or(String::new(), |m| format!("Plays on {} · {}", m.name, m.caption)),
                         },
-                        right: if !g.available() { "Not on this Mac yet".into() }
+                        right: if !g.available() { format!("Not on this {COMPUTER} yet") }
                                else if g.depots.is_empty() { format!("{} MB", g.options.first().map_or(0, |m| m.mb as i64)) } else { steam_size(g.gib()) },
                         on, enabled: g.available(), indent: false, id: Id::Toggle(g.id.clone()),
                     });
@@ -737,7 +737,7 @@ impl App {
                             rows.push(Row::note("It picks up where it stopped."));
                             prefer = Some(Id::TryAgain);
                         }
-                        _ => rows.push(Row::note("Installing… keep this window open. Your Mac can stay in use meanwhile.")),
+                        _ => rows.push(Row::note(format!("Installing… keep this window open. Your {COMPUTER} can stay in use meanwhile."))),
                     }
                 }
             }

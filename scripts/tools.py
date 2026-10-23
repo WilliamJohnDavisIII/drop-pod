@@ -217,7 +217,9 @@ def force_quit():
         if not running_games():
             return "ok"
         time.sleep(0.5)
-    return "error: The game didn't stop. Restart your Mac (Apple menu > Restart) to close it."
+    if sys.platform == "darwin":
+        return "error: The game didn't stop. Restart your Mac (Apple menu > Restart) to close it."
+    return "error: The game didn't stop. Restart your computer to close it."
 
 
 def report():

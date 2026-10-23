@@ -815,10 +815,11 @@ impl Library {
         let mut buttons = vec![("Uninstall, Keep Game Files".into(), Act::Uninstall(false))];
         if owns { buttons.push(("Uninstall and Delete Game Files".into(), Act::Uninstall(true))); }
         buttons.push(("Cancel".into(), Act::Close));
+        let closes = if cfg!(target_os = "macos") { " Any running game closes, and macOS asks for your password to remove the network setting." } else { " Any running game closes." };
         self.dialog = Some(Dialog { title: format!("Uninstall {n}?"), buttons, message: if owns {
-            format!("The game files {n} downloaded can stay (to set it up again later without downloading) or go. Any running game closes, and macOS asks for your password to remove the network setting.")
+            format!("The game files {n} downloaded can stay (to set it up again later without downloading) or go.{closes}")
         } else {
-            "Your game files folder stays as it is. Any running game closes, and macOS asks for your password to remove the network setting.".into()
+            format!("Your game files folder stays as it is.{closes}")
         } });
     }
 
@@ -948,7 +949,7 @@ impl Library {
             }
             Tool::ForceQuit => {
                 if ok { self.game_force_quit(); self.settings.say("The game was stopped.", true); }
-                else { self.settings.say(error_in(&last).unwrap_or_else(|| "The game couldn't be stopped. Restart your Mac to close it.".into()), false); }
+                else { self.settings.say(error_in(&last).unwrap_or_else(|| format!("The game couldn't be stopped. Restart your {COMPUTER} to close it.")), false); }
             }
             Tool::ResetGraphics => say(&mut self.settings, "Done. Halo 3 uses them the next time it starts.".into(), "The graphics settings couldn't be changed."),
             Tool::ForgetSteam => {

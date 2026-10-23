@@ -20,7 +20,7 @@ mv "$STAGE/guide.png" "$STAGE/How to open it the first time.png"
 cp CREDITS.md "$STAGE/Credits and licences.md"
 
 sed "s/@NAME@/$NAME/g" > "$STAGE/Read Me First.txt" <<'TXT'
-@NAME@ sets up community-made ways to play the Halo campaigns on your Mac, with split-screen co-op:
+@NAME@ sets up community-made ways to play Halo on your Mac, with split-screen co-op:
 Project Reclaimer for Halo 3, from your own Steam copy of Halo: The Master Chief Collection, and the
 native port of Halo CE, from your own Xbox disc.
 

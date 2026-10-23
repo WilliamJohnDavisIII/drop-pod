@@ -117,7 +117,7 @@ impl Setup {
         }); }
         self.home_free = paths::free_bytes(paths::home());
         let space_ok = self.home_free >= RUNTIME_BYTES;
-        list.push(Check { id: "space".into(), title: format!("Free space on this Mac: {} GB", (self.home_free / 1_073_741_824.0) as i64),
+        list.push(Check { id: "space".into(), title: format!("Free space on this {COMPUTER}: {} GB", (self.home_free / 1_073_741_824.0) as i64),
             ok: Some(space_ok), detail: if space_ok { String::new() } else {
                 "The Windows layer needs about 3 GB. Free up some space (empty the Trash, delete big downloads), then press Check Again.".into() } });
         let tools = proc::succeeds("/usr/bin/xcode-select", &["-p"]);

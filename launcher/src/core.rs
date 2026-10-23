@@ -8,6 +8,9 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
+/// What the app calls the player's machine in text every platform shows: "Mac" there, "computer" elsewhere.
+pub const COMPUTER: &str = if cfg!(target_os = "macos") { "Mac" } else { "computer" };
+
 /// The app's name, as make_app.sh puts it in Info.plist from the APP_NAME file (the one place to change it).
 pub fn app_name() -> &'static str {
     static NAME: OnceLock<String> = OnceLock::new();
