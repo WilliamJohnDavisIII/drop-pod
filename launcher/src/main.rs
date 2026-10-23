@@ -232,6 +232,10 @@ fn main() {
         // the Dock shows the bundle's own icon (AppIcon.icns): eframe would put egui's in its place, unless the icon
         // it's given can't be read (it then leaves the app's icon alone)
         viewport = viewport.with_icon(egui::IconData { rgba: vec![], width: 1, height: 1 });
+    } else if let Ok(img) = image::load_from_memory(include_bytes!("../assets/icon-256.png")) {
+        // Windows and Linux: the taskbar and title bar show Drop Pod's icon instead of egui's
+        let img = img.to_rgba8();
+        viewport = viewport.with_icon(egui::IconData { width: img.width(), height: img.height(), rgba: img.into_raw() });
     }
     let options = eframe::NativeOptions { viewport, ..Default::default() };
     if paths::var("DROPPOD_TEST_STEPS").is_some() { list::MOUSE.store(false, std::sync::atomic::Ordering::Relaxed); }
