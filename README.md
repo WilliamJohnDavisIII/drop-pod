@@ -233,5 +233,3 @@ affiliated with Microsoft, 343 Industries, Halo Studios or Valve. It contains no
 I only have a Mac, so Windows and Linux reports are the most useful thing you can send: what you ran, what you
 expected, what happened (and `logs/launcher.log`). The biggest open job is porting the guided setup (`install.sh`)
 to Windows and Linux. Issues and PRs welcome.
-
-Drop Pod is a fan project, not affiliated with or endorsed by Microsoft, 343 Industries or Halo Studios.
