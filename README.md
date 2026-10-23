@@ -1,8 +1,14 @@
 # Drop Pod
 
-Drop Pod sets up **community-made ways to play the Halo campaigns** on an Apple Silicon Mac, with split-screen
-co-op. It's one app that sets everything up from a window, with no Terminal: the community program, the Windows
-layer it needs and your own game files, each through a guided setup.
+Drop Pod sets up **community-made ways to play the Halo campaigns**, with split-screen co-op, on **macOS, Windows
+and Linux**. It's one app that sets everything up from a window, with no Terminal: the community program, anything
+it needs to run and your own game files, each through a guided setup.
+
+> **Platforms.** Drop Pod was born on a Mac, because a Mac is all I have, so macOS is the only platform it has been
+> tested on. The window builds for Windows and Linux, and on Windows the mods run natively (Reach Renaissance
+> included, which Wine blocks on the Mac and Linux). The guided setup is still Mac-only: on Windows and Linux,
+> install each mod by its own instructions for now, then play MCC from Steam (with Proton on Linux). **If you're on
+> Windows or Linux, any testing, bug report or PR is a godsend.** See [Contributing](#contributing).
 
 *(Working name. The name is set in one place, the `APP_NAME` file: the app, its folder, the disk image and every
 message follow it on the next build.)*
@@ -20,9 +26,11 @@ itself); it never includes game files. The games and their mods are listed in on
 [Project Reclaimer Mac Port](https://github.com/mattromano/project-reclaimer-mac-port) by Matt Romano, which did
 most of the hard work on the installer, the Steam QR sign-in and Halo 3. See [CREDITS.md](CREDITS.md).
 
-> **Status: not released.** More games come as their community mods run on the Mac.
+> **Status: early.** More games come as their community mods are added.
 
 ## What you need
+
+**On a Mac** (the guided setup below):
 
 - A Mac with Apple Silicon (M1 or newer) on macOS 14 Sonoma or newer.
 - For Halo 2 or Halo 3: Halo: The Master Chief Collection on Steam, and the Steam app on your phone (to scan a
@@ -33,7 +41,10 @@ most of the hard work on the installer, the Steam QR sign-in and Halo 3. See [CR
 - For Halo CE: a disc image (`.iso` or `.xiso`) of your own original Halo: Combat Evolved Xbox disc, and about 2 GB
   more on your Mac.
 
-## Installing, step by step
+**On Windows or Linux:** Halo: The Master Chief Collection on Steam (on Linux, with Proton turned on for it), and
+the Drop Pod download for your system from [Releases](../../releases).
+
+## Installing on a Mac, step by step
 
 1. **Open the disk image.** Double-click `Drop-Pod.dmg`. A window opens with "Drop Pod", "Applications", a picture
    called "How to open it the first time" and "Read Me First".
@@ -217,10 +228,10 @@ ChupathingyCE projects: see [CREDITS.md](CREDITS.md).
 Halo and Halo: The Master Chief Collection are trademarks of Microsoft. Drop Pod is an unofficial fan project, not
 affiliated with Microsoft, 343 Industries, Halo Studios or Valve. It contains no game files.
 
-## Platforms
+## Contributing
 
-macOS: works. Windows and Linux: experimental, untested (I only have a Mac). PRs welcome.
-
-On Windows and Linux the launcher window builds and opens (see Releases), but the automatic setup is Mac-only so far: install each mod by its own instructions (links above), then launch MCC from Steam (on Linux, with Proton). Help porting the setup is very welcome.
+I only have a Mac, so Windows and Linux reports are the most useful thing you can send: what you ran, what you
+expected, what happened (and `logs/launcher.log`). The biggest open job is porting the guided setup (`install.sh`)
+to Windows and Linux. Issues and PRs welcome.
 
 Drop Pod is a fan project, not affiliated with or endorsed by Microsoft, 343 Industries or Halo Studios.
