@@ -120,13 +120,15 @@ impl Setup {
         list.push(Check { id: "space".into(), title: format!("Free space on this {COMPUTER}: {} GB", (self.home_free / 1_073_741_824.0) as i64),
             ok: Some(space_ok), detail: if space_ok { String::new() } else {
                 "The Windows layer needs about 3 GB. Free up some space (empty the Trash, delete big downloads), then press Check Again.".into() } });
-        let tools = proc::succeeds("/usr/bin/xcode-select", &["-p"]);
-        self.needs_dev_tools = !tools;
-        list.push(Check { id: "tools".into(), title: "Apple's developer tools".into(), ok: Some(tools), detail: if tools { String::new() } else {
-            "A small free Apple component the helper scripts use. Press the button below: macOS asks to install it (click Install, then Agree). It takes about 5 minutes.".into() } });
-        if !proc::succeeds("/usr/bin/arch", &["-x86_64", "/usr/bin/true"]) {
-            list.push(Check { id: "rosetta".into(), title: "Rosetta (Apple's Intel translator)".into(), ok: None,
-                              detail: "Installed during setup; macOS asks for your password.".into() });
+        if cfg!(target_os = "macos") {
+            let tools = proc::succeeds("/usr/bin/xcode-select", &["-p"]);
+            self.needs_dev_tools = !tools;
+            list.push(Check { id: "tools".into(), title: "Apple's developer tools".into(), ok: Some(tools), detail: if tools { String::new() } else {
+                "A small free Apple component the helper scripts use. Press the button below: macOS asks to install it (click Install, then Agree). It takes about 5 minutes.".into() } });
+            if !proc::succeeds("/usr/bin/arch", &["-x86_64", "/usr/bin/true"]) {
+                list.push(Check { id: "rosetta".into(), title: "Rosetta (Apple's Intel translator)".into(), ok: None,
+                                  detail: "Installed during setup; macOS asks for your password.".into() });
+            }
         }
         self.checks_passed = list.iter().all(|c| c.ok != Some(false));
         self.log(&format!("checks: {:?}", list.iter().map(|c| format!("{}={}", c.id, c.ok.map_or("info".into(), |o| o.to_string()))).collect::<Vec<_>>()));

@@ -10,12 +10,17 @@
   in its own prefix, with the game files linked where it looks; it asks you to install Wine if it's missing).
 - ChupathingyCE downloads its Windows or Linux build.
 - Drop Pod's icon on Windows (exe, taskbar) and Linux (app menu, taskbar).
+- The setup checks no longer ask for Apple's developer tools or Rosetta there.
 
 **Wording**
 - Text shown on every platform says "computer" off the Mac ("Not on this computer yet", free space, uninstall,
   stop-the-game messages, Show Folder) and drops the Mac-only password and network-setting notes there.
 - "Community-made ways to play Halo" instead of "the Halo campaigns" in the disk image's read-me.
 - README: "Other ways to play", linking HCEMobile and HaloPad (neither part of Drop Pod).
+
+**Build**
+- Release builds work without a strip workaround: only the app is stripped, not the build scripts and macros
+  cargo builds for itself.
 
 ## 0.1.0 (2026-10-23)
 

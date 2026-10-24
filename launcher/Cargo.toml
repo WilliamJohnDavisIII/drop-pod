@@ -37,3 +37,7 @@ lto = "thin"
 codegen-units = 4
 strip = true
 panic = "abort"
+
+# strip only the app: stripping the proc-macros and build scripts cargo builds for itself breaks the build (E0463)
+[profile.release.build-override]
+strip = false
