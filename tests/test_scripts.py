@@ -6,6 +6,8 @@ import http.server
 import io
 import json
 import os
+import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -185,18 +187,20 @@ class Games(unittest.TestCase):
             self.assertEqual(c["wanted"], ["halo2", "halo2-mp", "halo3"])
 
     def test_catalogue(self):
-        self.assertEqual(games.PLAY_WITH, {"halo1": ["chupathingyce"], "halo2": ["gravemind"], "halo3": ["reclaimer"]})
-        self.assertEqual(games.GAMES, {"halo1": [], "halo2": [976735], "halo3": [976738, 976739]})
+        self.assertEqual(games.PLAY_WITH, {"halo1": ["chupathingyce"], "halo2": ["gravemind"], "halo3": ["reclaimer"],
+                                         "haloreach": ["renaissance"]})
+        self.assertEqual(games.GAMES, {"halo1": [], "halo2": [976735], "halo3": [976738, 976739],
+                                     "haloreach": [1064225, 1064226]})
         self.assertEqual(self.run_games("mods", "halo1"), "chupathingyce mac - ChupathingyCE\n")
         self.assertEqual(self.run_games("mods", "halo3", "halo1"), "chupathingyce mac - ChupathingyCE\n"
                          "reclaimer wine mesa,spinfix,loopback,presets Project Reclaimer\n")
         self.assertEqual(self.run_games("mods", "halo2"), "gravemind wine - Project Gravemind\n")
         self.assertEqual(self.run_games("mods"), "")
-        # Reach is in the catalogue, but its only mod stops itself under Wine: nothing to install or play here
         self.assertIn("haloreach", [g["id"] for g in games.CATALOGUE["games"]])
-        self.assertFalse(games.runs_here("renaissance"))
-        self.assertEqual(games.needed({"haloreach", "halo3"}), [976731, 976738, 976739])
-        self.assertEqual(self.run_games("mods", "haloreach"), "")
+        self.assertTrue(games.runs_here("renaissance"))
+        self.assertEqual(games.needed({"haloreach", "halo3"}), [976731, 976738, 976739, 1064225, 1064226])
+        self.assertEqual(self.run_games("mods", "haloreach"),
+                         "renaissance wine msruntimes,chromehoist,presets Reach Renaissance\n")
 
 
 class Release(http.server.BaseHTTPRequestHandler):
@@ -345,13 +349,19 @@ class Mods(unittest.TestCase):
         self.assertEqual(out, "h2gravemind.exe 0 xx")
 
     def test_a_mod_that_stops_under_wine(self):
-        why = games.MODS["renaissance"]["notUnderWine"]
-        self.assertEqual(self.mods("get", "renaissance"), [f"error: {why}"])
-        self.assertEqual(self.mods("which", "haloreach"), [])
-        env = dict(os.environ, DROPPOD_HOME=str(self.home))
-        p = subprocess.run([sys.executable, "-I", "-B", str(SCRIPTS / "mods.py"), "launch", "renaissance"],
-                           capture_output=True, text=True, env=env)
-        self.assertEqual((p.returncode, p.stdout, p.stderr.strip()), (1, "", f"error: {why}"))
+        # Keep the generic guard covered without declaring a real, supported mod unavailable.
+        scripts = self.home / "scripts"
+        shutil.copytree(SCRIPTS, scripts)
+        catalogue = json.loads((scripts / "mods.json").read_text())
+        why = "This test mod stops under Wine."
+        next(m for m in catalogue["mods"] if m["id"] == "renaissance")["notUnderWine"] = why
+        (scripts / "mods.json").write_text(json.dumps(catalogue))
+        env = dict(os.environ, DROPPOD_HOME=str(self.home), DROPPOD_PLATFORM="mac")
+        for command in ("get", "launch"):
+            p = subprocess.run([sys.executable, "-I", "-B", str(scripts / "mods.py"), command, "renaissance"],
+                               capture_output=True, text=True, env=env)
+            self.assertEqual(p.returncode, 1)
+            self.assertEqual((p.stdout + p.stderr).strip(), f"error: {why}")
 
     def test_unpack_windows_paths(self):
         # Reach Renaissance's zip writes its paths with backslashes; ditto would keep them in the file names
@@ -385,6 +395,122 @@ class Mods(unittest.TestCase):
         self.assertEqual(out[0], f"{self.home / 'prefixes' / 'reclaimer'} project-reclaimer-client-v0.9.22.exe 3 "
                                  "llvmpipe 2 opengl32=n,b;xaudio2_9=d")
         self.assertEqual(out[1], r"C:\Program Files (x86)\Steam\steamapps\common\Halo The Master Chief Collection")
+
+    def test_launch_reach(self):
+        folder = self.home / "mods/renaissance/ReachRenaissance"
+        folder.mkdir(parents=True)
+        (folder / "Reach Renaissance.exe").write_bytes(b"MZ")
+        script = "\n".join(self.mods("launch", "renaissance"))
+        env = dict(os.environ)
+        env.pop("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", None)
+        out = subprocess.run(["/bin/zsh", "-c", script +
+                              '\nprint -r -- "$MOD_DIR|$EXE|${#ARGS}|$MOD_OVERRIDES|$WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"'],
+                             capture_output=True, text=True, env=env, check=True).stdout.strip()
+        self.assertEqual(out, "ReachRenaissance|Reach Renaissance.exe|0|"
+                         "vcruntime140,vcruntime140_1,msvcp140,msvcp140_1,msvcp140_2,concrt140,d3dcompiler_47=n,b;"
+                         "xaudio2_9=d|--no-sandbox")
+
+    def test_chromehoist_restored_after_webview_update(self):
+        edge = self.home / "prefixes/renaissance/drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application"
+        ours = self.home / "chromehoist/msedge_elf.dll"
+        ours.parent.mkdir()
+        ours.write_bytes(b"our proxy")
+        original = b"MZ" + b"x" * 1_000_000
+        for version in ("99.0.1.0", "156.0.1.0"):
+            runtime = edge / version
+            runtime.mkdir(parents=True)
+            (runtime / "msedge_elf.dll").write_bytes(original)
+        newest = edge / "156.0.1.0"
+        self.assertIn("chromehoist installed", self.mods("prepare", "renaissance")[0])
+        self.assertEqual((newest / "msedge_elf.dll").read_bytes(), ours.read_bytes())
+        self.assertEqual((newest / "msedge_elf_orig.dll").read_bytes(), original)
+        self.assertEqual((edge / "99.0.1.0/msedge_elf.dll").read_bytes(), original)
+        self.assertEqual(self.mods("prepare", "renaissance"), [])
+        updated = edge / "157.0.1.0"
+        updated.mkdir()
+        (updated / "msedge_elf.dll").write_bytes(original + b"update")
+        self.mods("prepare", "renaissance")
+        self.assertEqual((updated / "msedge_elf_orig.dll").read_bytes(), original + b"update")
+        # A new proxy build replaces only our previous proxy, keeping the forwarding target intact.
+        ours.write_bytes(b"new proxy")
+        self.mods("prepare", "renaissance")
+        self.assertEqual((updated / "msedge_elf.dll").read_bytes(), b"new proxy")
+        self.assertEqual((updated / "msedge_elf_orig.dll").read_bytes(), original + b"update")
+        self.assertFalse((updated / "msedge_elf.dll.new").exists())
+
+    def test_chromehoist_refuses_to_overwrite_without_original(self):
+        ours = self.home / "chromehoist/msedge_elf.dll"
+        ours.parent.mkdir()
+        ours.write_bytes(b"proxy")
+        runtime = self.home / "prefixes/renaissance/drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application/156.0.1.0"
+        runtime.mkdir(parents=True)
+        (runtime / "msedge_elf.dll").write_bytes(b"unrecognized small DLL")
+        p = subprocess.run([sys.executable, "-I", "-B", str(SCRIPTS / "mods.py"), "prepare", "renaissance"],
+                           env=dict(os.environ, DROPPOD_HOME=str(self.home)), capture_output=True, text=True)
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("no original msedge_elf.dll", p.stderr)
+        self.assertEqual((runtime / "msedge_elf.dll").read_bytes(), b"unrecognized small DLL")
+
+
+class ReachAssets(unittest.TestCase):
+    def test_watch_reach_ignores_other_installs_and_runtime_updater(self):
+        with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as other:
+            home = Path(d).resolve()  # lsof reports macOS's canonical /private/var path
+            # Simulate a lingering WebView2 updater in this install and Reach running in another install.
+            processes = [subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)", name], cwd=cwd)
+                         for name, cwd in (("MicrosoftEdgeUpdate.exe", d),
+                                           (r"ReachRenaissance\bin\host-probe.exe", other))]
+            cmd = [sys.executable, "-I", "-B", str(SCRIPTS / "tools.py"), "game-running", "renaissance"]
+            env = dict(os.environ, DROPPOD_HOME=str(home))
+            try:
+                self.assertEqual(subprocess.check_output(cmd, env=env, text=True).strip(), "stopped")
+                processes.append(subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)",
+                                                   r"ReachRenaissance\bin\host-probe.exe"], cwd=home))
+                self.assertEqual(subprocess.check_output(cmd, env=env, text=True).strip(), "running")
+            finally:
+                for process in processes:
+                    process.terminate()
+                    process.wait(timeout=5)
+
+    def test_restore_graphics_with_only_reach_installed(self):
+        with tempfile.TemporaryDirectory() as d:
+            home = Path(d)
+            shutil.copytree(SCRIPTS, home / "scripts")
+            prefix = home / "prefixes/renaissance"
+            (prefix / "drive_c/users/player").mkdir(parents=True)
+            (prefix / "system.reg").touch()
+            out = subprocess.run([sys.executable, "-I", "-B", str(home / "scripts/tools.py"), "reset-graphics"],
+                                 env=dict(os.environ, DROPPOD_HOME=d), capture_output=True, text=True, check=True)
+            self.assertEqual(out.stdout.strip(), "ok")
+            settings = prefix / "drive_c/users/player/AppData/Local/ReachRenaissance/settings.txt"
+            self.assertEqual(settings.read_text(), "fps=60\nvsync=on\n")
+
+    def test_pinned_proxy_and_export_table(self):
+        repo = SCRIPTS.parent
+        pin = re.search(r"^CHROMEHOIST_SHA=([0-9a-f]{64})", (repo / "install.sh").read_text(), re.M)[1]
+        dll = repo / "chromehoist/msedge_elf.dll"
+        self.assertEqual(hashlib.sha256(dll.read_bytes()).hexdigest(), pin)
+        out = subprocess.run([sys.executable, "-I", "-B", str(repo / "chromehoist/exports.py"), str(dll)],
+                             capture_output=True, text=True, check=True).stdout
+        definitions = (repo / "chromehoist/msedge_elf.def").read_text()
+        self.assertEqual([s for s in out.splitlines() if not s.startswith(";")],
+                         [s for s in definitions.splitlines() if not s.startswith(";")])
+        self.assertEqual(sum("=" in s for s in out.splitlines()), 68)
+
+    def test_presets_only_seed_missing_keys(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "prefixes/renaissance/drive_c/users/player/AppData/Local/ReachRenaissance/settings.txt"
+            path.parent.mkdir(parents=True)
+            path.write_text("volume=12\nfps=144")
+            cmd = [sys.executable, "-I", "-B", str(SCRIPTS / "presets.py"), "renaissance"]
+            env = dict(os.environ, DROPPOD_HOME=d)
+            subprocess.run(cmd, env=env, check=True, capture_output=True)
+            self.assertEqual(path.read_text(), "volume=12\nfps=144\nvsync=on\n")
+            subprocess.run(cmd, env=env, check=True, capture_output=True)
+            self.assertEqual(path.read_text(), "volume=12\nfps=144\nvsync=on\n")
+            path.unlink()
+            subprocess.run(cmd, env=env, check=True, capture_output=True)
+            self.assertEqual(path.read_text(), "fps=60\nvsync=on\n")
 
 
 class CrashReports(unittest.TestCase):

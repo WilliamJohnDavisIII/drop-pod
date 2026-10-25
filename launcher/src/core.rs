@@ -57,7 +57,7 @@ pub struct Mod {
     pub process: String, // the running game as ps shows it (a regular expression)
     pub setup: String,   // "with-game": set up with its game (install.sh); "xbox-disc": from the player's disc
     pub extras: Option<Vec<String>>, // what install.sh adds for it: mesa, spinfix, loopback, presets
-    pub not_under_wine: Option<String>, // it stops itself under Wine (Reach Renaissance): why, for the player
+    pub not_under_wine: Option<String>, // it stops itself under Wine: why, for the player
     pub windows: Option<PlatformFiles>, // its download and program on Windows, when they aren't the Mac's
     pub linux: Option<PlatformFiles>,
 }
@@ -87,7 +87,7 @@ pub struct Game {
     pub options: Vec<Mod>,   // what it can play with, the default first
     pub depots: Vec<Depot>,  // what its mods need, in the catalogue's order (none: the native port reads the disc)
     pub addons: Vec<AddOn>,  // optional extra game files, ticked with it (Halo 2's multiplayer maps)
-    /// None of its mods runs here (Reach: Reach Renaissance stops itself under Wine): why, for the player. It's
+    /// None of its mods runs here: why, for the player. It's
     /// still listed, greyed out, and never set up, downloaded or played.
     pub unavailable: Option<String>,
 }
@@ -148,7 +148,7 @@ pub struct Catalogue {
     pub base_depot: Depot,
     pub depots: Vec<Depot>,
     pub mods: Vec<Mod>,
-    /// Every game in the catalogue; one whose mods don't run here (Reach: its mod stops itself under Wine) is
+    /// Every game in the catalogue; one whose mods don't run here is
     /// listed as unavailable.
     pub games: Vec<Game>,
 }
@@ -493,6 +493,8 @@ pub fn step_titles() -> &'static [(&'static str, Option<String>)] {
             ("Helper scripts", t("Setting up the helper scripts")),
             ("Windows environment for ", t("Setting up {}'s own space")),
             ("Menu library (Mesa) for ", t("Getting {}'s menu graphics library")),
+            ("Microsoft runtimes for ", t("Getting {}'s Microsoft menu libraries")),
+            ("WebView2 menu fix for ", t("Setting up {}'s menus for your Mac")),
             ("Mod: ", t("Downloading {} (plays {game})")),
             ("Tuned graphics settings for ", t("Choosing {}'s graphics settings for your Mac")),
             ("Game launchers", t("Setting up the Play buttons")),
@@ -632,13 +634,12 @@ mod tests {
         let opts: Vec<Vec<&str>> = games().iter().map(|g| g.options.iter().map(|m| m.id.as_str()).collect()).collect();
         assert_eq!(opts, [vec!["chupathingyce"], vec!["gravemind"], vec!["reclaimer"], vec!["renaissance"]], "each game's mods");
         let reach = game("haloreach").unwrap();
-        assert!(!reach.available() && reach.unavailable.as_deref().is_some_and(|r| r.contains("Wine")),
-                "Reach is listed but unavailable: Reach Renaissance stops itself under Wine, and the tile says why");
-        assert!(games().iter().filter(|g| g.id != "haloreach").all(|g| g.available()), "the others are available");
-        assert!(depots_for(&set(&["haloreach"])).is_empty() && installed_games(&[976731, 1064225, 1064226].into()).is_empty(),
-                "an unavailable game is never downloaded or counted as installed");
+        assert!(reach.available() && reach.unavailable.is_none(), "Reach Renaissance runs under Wine");
+        assert!(games().iter().all(|g| g.available()), "every game has an available mod");
+        assert_eq!(ids(&depots_for(&set(&["haloreach"]))), [976731, 1064225, 1064226], "Reach's shared and game depots");
+        assert_eq!(installed_games(&[976731, 1064225, 1064226].into()), ["haloreach"], "Reach's files count as installed");
         assert!(mods().iter().all(|m| !gids.contains(&m.id.as_str())), "mod and game IDs never clash");
-        assert!(mod_("renaissance").is_some_and(|m| !m.runs_here()), "Reach Renaissance doesn't run under Wine");
+        assert!(mod_("renaissance").is_some_and(|m| m.runs_here()), "Reach Renaissance runs under Wine");
         assert!(base_depot().id == 976731 && catalogue().steam_app == 976730, "MCC's shared depot and Steam app");
         for m in mods() {
             assert!(["wine", "mac"].contains(&m.runs.as_str()) && ["with-game", "xbox-disc"].contains(&m.setup.as_str()), "{}: how it runs", m.id);
@@ -648,7 +649,7 @@ mod tests {
             assert!(m.depots.iter().all(|d| catalogue().depots.iter().any(|x| x.id == *d)) && !m.depots.contains(&base_depot().id),
                     "{}: depots from the list (the shared one comes with any)", m.id);
             assert!(m.mb > 0.0 && !m.about.is_empty() && !m.caption.is_empty(), "{}: size and words", m.id);
-            assert!(m.extras.iter().flatten().all(|e| ["mesa", "spinfix", "loopback", "presets"].contains(&e.as_str())), "{}: extras", m.id);
+            assert!(m.extras.iter().flatten().all(|e| ["mesa", "spinfix", "loopback", "presets", "msruntimes", "chromehoist"].contains(&e.as_str())), "{}: extras", m.id);
             assert!(games().iter().any(|g| g.options.contains(m)), "{}: some game plays with it", m.id);
         }
         assert!(mod_("reclaimer").unwrap().on_wine() && mod_("reclaimer").unwrap().has("loopback"));
@@ -657,15 +658,15 @@ mod tests {
         assert_eq!(ids(&depots_for(&set(&["halo2"]))), [976731, 976735], "Halo 2 on Project Gravemind: shared, campaign");
         assert_eq!(ids(&depots_for(&set(&["halo2", "halo2-mp"]))), [976731, 976735, 976736], "Halo 2's multiplayer maps, when ticked");
         assert_eq!(ids(&depots_for(&set(&["halo2-mp", "halo3"]))), [976731, 976738, 976739], "an add-on never comes without its game");
-        assert_eq!(choice_order(), ["halo1", "halo2", "halo2-mp", "halo3", "halo3-odst"], "add-ons follow their game");
+        assert_eq!(choice_order(), ["halo1", "halo2", "halo2-mp", "halo3", "halo3-odst", "haloreach"], "add-ons follow their game");
         assert_eq!(ids(&depots_for(&set(&["halo3", "halo3-odst"]))), [976731, 976738, 976739, 1064222], "ODST, when ticked");
         assert_eq!(add_on("halo3-odst").unwrap().game, "halo3");
         assert_eq!(add_on("halo2-mp").unwrap().game, "halo2");
         assert!(mod_("gravemind").unwrap().on_wine() && mod_("gravemind").unwrap().source.sums.is_none(), "Gravemind: GitHub's checksums");
         assert!(depots_for(&set(&["halo1"])).is_empty(), "Halo CE's native port downloads nothing from Steam");
         assert!(depots_for(&set(&[])).is_empty(), "nothing chosen, nothing needed");
-        let all: HashSet<String> = games().iter().map(|g| g.id.clone()).collect(); // (Reach among them: never counted)
-        assert!((DownloadPlan::new(&all, &HashSet::new()).gib() - (16.0 + 29.1 + 8.4 + 8.7)).abs() < 0.01, "total size");
+        let all: HashSet<String> = games().iter().map(|g| g.id.clone()).collect();
+        assert!((DownloadPlan::new(&all, &HashSet::new()).gib() - (16.0 + 29.1 + 8.4 + 8.7 + 9.1 + 7.3)).abs() < 0.01, "total size");
         assert_eq!(ids(&DownloadPlan::new(&set(&["halo3"]), &[976731, 976738].into()).needed), [976739], "only what's missing");
         assert!(DownloadPlan::new(&set(&["halo3"]), &[976731, 976738, 976739].into()).is_empty(), "nothing missing");
         assert!(!depots_for(&all).iter().any(|d| [1064227, 1064228, 1064229, 1064274, 1064275].contains(&d.id)), "no language depots");

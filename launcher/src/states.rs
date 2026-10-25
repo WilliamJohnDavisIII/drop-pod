@@ -156,10 +156,13 @@ pub fn render_states(dir: &Path, qr_sample: Option<&Path>) {
     save(&mut h, &ctx, &mut a, dir, "12-library-notice");
     save(&mut h, &ctx, &mut library(three, false, false), dir, "13-library-not-set-up");
     let mut a = library(three, true, false); a.game_sel = games().iter().position(|g| g.id == "haloreach").unwrap_or(0);
-    save(&mut h, &ctx, &mut a, dir, "14-library-reach-not-here");
+    save(&mut h, &ctx, &mut a, dir, "14-library-reach-not-installed");
 
     // the guided setups
     let reclaimer = mod_("reclaimer").unwrap();
+    let mut a = library(three, true, false);
+    a.lib.setup_mod = Some("renaissance".into()); a.lib.sheet = Some(Sheet::Mod);
+    save(&mut h, &ctx, &mut a, dir, "15b-reach-explain");
     let mut a = library(three, false, false);
     a.lib.setup_mod = Some(reclaimer.id.clone()); a.lib.sheet = Some(Sheet::Mod);
     save(&mut h, &ctx, &mut a, dir, "15-reclaimer-explain");

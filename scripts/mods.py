@@ -9,6 +9,7 @@
                                 else the game's first mod)
   mods.py launch <mod>          shell lines for run_wine.sh: WINEPREFIX, MOD_DIR (the folder in mods/<mod>/ it starts
                                 from), EXE, ARGS, the mod's DLL overrides and environment
+  mods.py prepare <mod>         restore chromehoist into the newest WebView2 runtime before a Mac launch
 
 A mod that stops itself under Wine (notUnderWine in the catalogue) is neither downloaded nor started: get and launch
 say why.
@@ -232,6 +233,32 @@ def which(game, choice=""):
     return f"{mod} {MODS[mod]['runs']}"
 
 
+def prepare(mod):
+    """Evergreen WebView2 updates create a new version folder without our menu fix. Keep its original DLL as the
+    forwarding target; replace only the proxy, atomically, so a failed copy can be retried."""
+    if "chromehoist" not in MODS[mod].get("extras", []):
+        return
+    edge = prefix(mod) / "drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application"
+    versions = [d for d in edge.iterdir() if d.is_dir() and re.fullmatch(r"\d+(?:\.\d+)+", d.name)] if edge.is_dir() else []
+    if not versions:
+        raise ValueError("No WebView2 runtime in the prefix. Open Drop Pod and use Settings > Repair")
+    target = max(versions, key=lambda d: version_key(d.name))
+    ours = BASE / "chromehoist/msedge_elf.dll"
+    if not ours.is_file():
+        raise ValueError("The WebView2 menu fix is missing. Open Drop Pod and use Settings > Repair")
+    proxy, original = target / "msedge_elf.dll", target / "msedge_elf_orig.dll"
+    if proxy.is_file() and proxy.read_bytes() == ours.read_bytes() and original.is_file():
+        return
+    if proxy.is_file() and proxy.stat().st_size > 1_000_000:
+        proxy.replace(original)
+    if not original.is_file():
+        raise ValueError(f"WebView2 {target.name} has no original msedge_elf.dll to forward to. Reinstall its runtime")
+    new = proxy.with_suffix(".dll.new")
+    shutil.copyfile(ours, new)
+    new.replace(proxy)
+    say(f"chromehoist installed into WebView2 {target.name}")
+
+
 def launch(mod):
     """What run_wine.sh needs, as shell lines it evaluates. Environment values the player already set win."""
     m = MODS[mod]
@@ -269,10 +296,12 @@ def main(argv):
             print(which(argv[2], argv[3] if len(argv) == 4 else ""))
         elif len(argv) == 3 and argv[1] == "launch" and argv[2] in MODS:
             print(launch(argv[2]))
+        elif len(argv) == 3 and argv[1] == "prepare" and argv[2] in MODS:
+            prepare(argv[2])
         else:
             print(__doc__)
             return 2
-    except ValueError as e:
+    except (ValueError, OSError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
     return 0

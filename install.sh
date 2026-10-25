@@ -1,7 +1,7 @@
 #!/bin/bash
 # Drop Pod (the name is set in APP_NAME): sets up community mods of the Halo campaigns on an Apple Silicon Mac. The
 # mods, their games and what each needs come from the catalogue (scripts/mods.json, through games.py and mods.py):
-# Halo 2 runs on Project Gravemind and Halo 3 on Project Reclaimer, from the player's own Steam copy of Halo: The Master
+# Halo 2 runs on Project Gravemind, Halo 3 on Project Reclaimer and Reach on Reach Renaissance, from the player's own Steam copy of Halo: The Master
 # Chief Collection, each under Wine Staging + DXVK-macOS + MoltenVK in its own prefix; Halo CE on ChupathingyCE, a Mac app that plays from the player's
 # own Xbox disc (imported from the library). Only what the chosen games' mods need is installed: Halo CE alone needs
 # no Wine and no Steam download.
@@ -10,10 +10,11 @@
 #
 # Everything lives in ~/Library/Application Support/<name> (DROPPOD_HOME), except the game files (DROPPOD_GAME_FILES).
 # Options (environment variables; the window sets them, re-runs fall back to config.json):
-#   DROPPOD_GAMES="halo1 halo2 halo3"  the games wanted; each brings its mod (the first in mods.json) and what it needs:
+#   DROPPOD_GAMES="halo1 halo2 halo3 haloreach"  the games wanted; each brings its mod (the first in mods.json) and what it needs:
 #                               halo3 Project Reclaimer (its program, Mesa, spinfix, the network helper) and Halo 3's
 #                               campaign and multiplayer depots; halo2 Project Gravemind and Halo 2's campaign depot
-#                               (halo2-mp with it: its multiplayer maps' depot, optional); halo1 ChupathingyCE.
+#                               (halo2-mp with it: its multiplayer maps' depot, optional); halo1 ChupathingyCE;
+#                               haloreach Reach Renaissance (Microsoft runtimes and the chromehoist menu fix).
 #   DROPPOD_GAME_FILES=<dir>     where the game files are or go (default: <home>/Game Files)
 #   DROPPOD_SOURCE=steam|existing   download them from Steam, or use an MCC folder the player already has, in place
 #                               (only the depots it lacks are downloaded into it)
@@ -23,7 +24,7 @@
 #   DROPPOD_DRY_RUN=1            print what would be downloaded, run in Wine, or done as admin, without doing it
 #   DROPPOD_CACHE=<dir>          reuse already-downloaded archives from <dir> (kept afterwards)
 #   DROPPOD_APP_SOURCE=<.app>    the app the player opened: copied into ~/Applications when it isn't installed there
-#   DROPPOD_RESET_GRAPHICS=1     put back Halo 3's tuned graphics settings (otherwise only a fresh install gets them)
+#   DROPPOD_RESET_GRAPHICS=1     restore tuned graphics settings (Reach only fills in missing keys)
 set -euo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)
@@ -47,8 +48,12 @@ DXVK_PKG="dxvk-macOS-async-v1.10.3-20230507-repack.tar.gz|https://github.com/Gce
 MOLTENVK_PKG="MoltenVK-macos-1.4.2.tar|https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.2/MoltenVK-macos.tar|f95765a6229cb7b915990a2890ce12ebe36a730b021545d3d52ae69ce4c4024e"
 MESA_PKG="mesa3d-26.2.4-release-msvc.7z|https://github.com/pal1000/mesa-dist-win/releases/download/26.2.4/mesa3d-26.2.4-release-msvc.7z|351fc8c8b695878ffb3eaa044b3ead08672a48b1a045e3c3e3975811df0f6695"
 DEPOT_PKG="DepotDownloader-macos-arm64.zip|https://github.com/SteamRE/DepotDownloader/releases/download/DepotDownloader_3.4.0/DepotDownloader-macos-arm64.zip|60e80c7c496f3f9a079cd3c62036b35d088c27bc0149baf38f009eb57a52f6a5"
+# Direct, version-pinned Microsoft downloads; bump the URL and checksum together when updating the runtimes.
+VC_REDIST_PKG="vc_redist.x64.exe|https://download.visualstudio.microsoft.com/download/pr/990c720a-46ce-4dc7-87b9-c2eb615d34b9/CC0FF0EB1DC3F5188AE6300FAEF32BF5BEEBA4BDD6E8E445A9184072096B713B/VC_redist.x64.exe|cc0ff0eb1dc3f5188ae6300faef32bf5beeba4bdd6e8e445a9184072096b713b"
+WEBVIEW2_PKG="MicrosoftEdgeWebView2RuntimeInstallerX64.exe|https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/d6c50665-06a3-4ebe-8bde-7e408a78f093/MicrosoftEdgeWebView2RuntimeInstallerX64.exe|9b0142e22e8daa92855d746ae4d1e9eeef561ccaf67d1dd452165c4af3df3191"
 DXVK_DIR=dxvk-macOS-async-v1.10.3-20230507-repack
 SPINFIX_SHA=0ec56a555b7b420c381f7cf5010719c86c3626c3c99efcb376981089f5d4f847  # spinfix/d3d11.dll (built from spinfix/spinfix.c)
+CHROMEHOIST_SHA=2cae00421bfa39826c97a077213f13b9c4e435bb9c52390e4366c926d86f4bf1  # chromehoist/msedge_elf.dll
 # give up on a stalled connection instead of hanging (the window waits for this)
 CURL_LIMITS="--connect-timeout 20 --speed-limit 1024 --speed-time 60"
 RUNTIME_GB=3  # Wine, the prefixes, the mods and the downloads while they unpack
@@ -91,11 +96,12 @@ as_admin() {  # as_admin "<shell command>" "<why>": sudo in Terminal; macOS's pa
   fi
 }
 
-wine_run() {  # wine_run <prefix> <wine args...>: in that prefix, then wait for its wineserver
-  local pfx=$1; shift
+wine_run() {  # wine_run <prefix> [--no-wait] <wine args...>: normally wait for the prefix's wineserver too
+  local pfx=$1 wait=1; shift
+  if [ "${1:-}" = --no-wait ]; then wait=""; shift; fi
   if [ -n "$DRY" ]; then dry "WINEPREFIX=$pfx wine $*"; return 0; fi
   WINEPREFIX="$pfx" WINEDEBUG=-all WINEDLLOVERRIDES="mscoree,mshtml=" "$WINE_BIN/wine" "$@" >/dev/null 2>&1 || true
-  WINEPREFIX="$pfx" WINEDEBUG=-all "$WINE_BIN/wineserver" -w
+  if [ -n "$wait" ]; then WINEPREFIX="$pfx" WINEDEBUG=-all "$WINE_BIN/wineserver" -w; fi
 }
 
 installed() { [ -z "$REPAIR" ] && [ "$(cat "$BASE/.installed/$1" 2>/dev/null)" = "$2" ]; }
@@ -316,6 +322,76 @@ step_mesa() {  # step_mesa <mod>
   note "ok"
 }
 
+wine_builtin() { LC_ALL=C grep -a -q 'Wine builtin DLL' "$1" 2>/dev/null; }
+vc_installed() {
+  local f
+  for f in msvcp140.dll msvcp140_1.dll msvcp140_2.dll vcruntime140.dll vcruntime140_1.dll concrt140.dll; do
+    [ -f "$1/$f" ] && ! wine_builtin "$1/$f" || return 1
+  done
+}
+webview_installed() {
+  local d
+  for d in "$1"/[0-9]*; do
+    [ -f "$d/msedgewebview2.exe" ] && [ -f "$d/msedge_elf.dll" ] && return 0
+  done
+  return 1
+}
+
+step_msruntimes() {  # step_msruntimes <mod>: Microsoft's DLLs rather than Wine's builtins
+  local mod=$1 pfx="$BASE/prefixes/$1" pkg f
+  local sys32="$pfx/drive_c/windows/system32"
+  local edge="$pfx/drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application"
+  bold "Microsoft runtimes for $(mod_name "$mod")"
+  if ! installed "$mod-vcredist" "${VC_REDIST_PKG##*|}" || ! vc_installed "$sys32"; then
+    pkg=$(fetch "$VC_REDIST_PKG")
+    if [ -z "$DRY" ]; then
+      # The redist installer otherwise leaves Wine's existing builtin files in place.
+      for f in "$sys32"/msvcp140*.dll "$sys32"/vcruntime140*.dll "$sys32/concrt140.dll"; do
+        if wine_builtin "$f"; then rm "$f"; fi
+      done
+    fi
+    # On repairs this prefix may already have EdgeUpdate running. The installer waits for its own work; do not
+    # wait for unrelated background processes in the Wine session, and check the installed DLLs below instead.
+    wine_run "$pfx" --no-wait "$pkg" /install /quiet /norestart
+    if [ -z "$DRY" ]; then
+      vc_installed "$sys32" || die "Microsoft's Visual C++ runtime did not install. Press Try Again."
+      mark_installed "$mod-vcredist" "${VC_REDIST_PKG##*|}"
+    fi
+  fi
+  if ! webview_installed "$edge"; then
+    pkg=$(fetch "$WEBVIEW2_PKG")
+    # The installer waits for its work, but leaves EdgeUpdate /c running in the background. Waiting for the whole
+    # Wine session here would leave setup stuck after installation succeeded; check the installed files instead.
+    wine_run "$pfx" --no-wait "$pkg" /silent /install
+    if [ -z "$DRY" ]; then
+      webview_installed "$edge" || die "Microsoft Edge WebView2 did not install. Press Try Again."
+      mark_installed "$mod-webview2" "${WEBVIEW2_PKG##*|}"
+    fi
+  fi
+  local compiler="$GAME_FILES/Engine/Binaries/ThirdParty/CEF3/Win64/d3dcompiler_47.dll"
+  if [ -n "$DRY" ]; then dry "copy MCC's shader compiler $compiler into $sys32"
+  else
+    [ -f "$compiler" ] || die "MCC's d3dcompiler_47.dll is missing. Repair the shared MCC game files and try again."
+    cmp -s "$compiler" "$sys32/d3dcompiler_47.dll" || cp "$compiler" "$sys32/d3dcompiler_47.dll"
+  fi
+  note "ok"
+}
+
+step_chromehoist() {
+  local mod=$1
+  bold "WebView2 menu fix for $(mod_name "$mod")"
+  [ "$(shasum -a 256 "$HERE/chromehoist/msedge_elf.dll" | cut -d' ' -f1)" = "$CHROMEHOIST_SHA" ] ||
+    die "checksum mismatch for chromehoist/msedge_elf.dll"
+  if [ -n "$DRY" ]; then dry "install chromehoist (sha256 $CHROMEHOIST_SHA) into the newest WebView2 runtime"
+  else
+    mkdir -p "$BASE/chromehoist"
+    cp "$HERE/chromehoist/msedge_elf.dll" "$BASE/chromehoist/msedge_elf.dll"
+    DROPPOD_HOME="$BASE" py "$BASE/scripts/mods.py" prepare "$mod" || die "Could not install the WebView2 menu fix."
+    mark_installed "$mod-chromehoist" "$CHROMEHOIST_SHA"
+  fi
+  note "ok"
+}
+
 step_mod() {  # step_mod <mod>: its latest release, unless it's there (it updates itself from then on)
   local mod=$1
   bold "Mod: $(mod_name "$mod") (latest release, checksum-verified)"
@@ -336,12 +412,17 @@ step_mod() {  # step_mod <mod>: its latest release, unless it's there (it update
 }
 
 step_presets() {  # step_presets <mod>
-  local mod=$1
+  local mod=$1 settings
+  case "$mod" in
+    reclaimer) settings='Documents/My Games/Project Reclaimer/settings.json' ;;
+    renaissance) settings='AppData/Local/ReachRenaissance/settings.txt' ;;
+    *) die "No graphics settings path for $mod" ;;
+  esac
   # only a fresh install (or DROPPOD_RESET_GRAPHICS=1) gets the tuned settings; otherwise the player's own stay
   if [ -n "${DROPPOD_RESET_GRAPHICS:-}" ] ||
-     ! ls "$BASE/prefixes/$mod"/drive_c/users/*/Documents/"My Games/Project Reclaimer/settings.json" >/dev/null 2>&1; then
+     ! ls "$BASE/prefixes/$mod"/drive_c/users/*/"$settings" >/dev/null 2>&1; then
     bold "Tuned graphics settings for $(mod_name "$mod")"
-    if [ -n "$DRY" ]; then dry "presets.py $mod (windowed at a size that fits this screen, 60 fps)"
+    if [ -n "$DRY" ]; then dry "presets.py $mod (recommended graphics, 60 fps)"
     else DROPPOD_HOME="$BASE" py "$BASE/scripts/presets.py" "$mod" | sed 's/^/    /'; fi
   fi
 }
@@ -351,6 +432,8 @@ step_mods() {  # every chosen game's mod, with what it needs
   for mod in $(mods_where wine); do
     step_prefix "$mod"
     mods_where mesa | grep -qx "$mod" && step_mesa "$mod"
+    mods_where msruntimes | grep -qx "$mod" && step_msruntimes "$mod"
+    mods_where chromehoist | grep -qx "$mod" && step_chromehoist "$mod"
     step_mod "$mod"
     mods_where presets | grep -qx "$mod" && step_presets "$mod"
   done
@@ -497,10 +580,11 @@ step_wine
 step_dxvk
 step_depotdownloader
 step_scripts
+# Reach's runtime setup copies the shader compiler from the shared game files.
+step_game_files
 step_mods
 step_launchers
 step_game_app
-step_game_files
 step_config
 step_app
 step_finish

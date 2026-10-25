@@ -5,9 +5,10 @@
   net-fix            reinstall + restart the network startup task (one macOS password prompt)
   controller-check   "stuck" if macOS's game controller service is stuck (no app sees controllers until a restart)
   crash-check <game> "crash: <plain explanation>" if that game's last log shows a crash, else "ok"
+  game-running <mod> "running" or "stopped": this install's mod processes, excluding runtime background tasks
   force-quit         stop every game, Wine and wineserver of this install (frozen windows Force Quit can't close)
   report             zip the logs and versions (no Steam account name) to the Desktop: "ok <path>"
-  reset-graphics     put back Halo 3's tuned graphics settings
+  reset-graphics     restore Halo 3's tuned graphics and fill in missing Reach graphics settings
   forget-steam       forget the saved Steam account (the next download shows a QR code)
   repair             delete crash dumps, then check the installed games' files against Steam (QR codes and progress
                      as steam.py download)
@@ -261,6 +262,8 @@ def reset_graphics():
     if running_games():  # (the game writes its settings when it quits)
         return "error: Quit the game first."
     for mod in (m for m, entry in games.MODS.items() if "presets" in entry.get("extras", [])):
+        if not (mods.prefix(mod) / "system.reg").is_file():
+            continue
         p = subprocess.run([sys.executable, "-I", str(SCRIPTS / "presets.py"), mod], capture_output=True, text=True)
         if p.returncode != 0:
             return "error: The graphics settings couldn't be changed."
@@ -401,6 +404,8 @@ def main(argv):
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
     if len(argv) == 3 and argv[1] == "crash-check":
         result = crash_check(argv[2])
+    elif len(argv) == 3 and argv[1] == "game-running" and argv[2] in games.MODS:
+        result = "running" if our_pids(games.MODS[argv[2]]["process"]) else "stopped"
     elif len(argv) == 4 and argv[1] == "play-with":
         try:
             games.play_with(CONFIG, argv[2], argv[3])

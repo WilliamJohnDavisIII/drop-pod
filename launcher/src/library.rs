@@ -567,9 +567,9 @@ impl Library {
         if self.game_process.is_none() { self.game_stopped(true); }
     }
 
-    /// The running game, as it shows up (its launcher may exit while it keeps running): a Wine mod's whole Wine session
+    /// The running game, as it shows up (its launcher may exit while it keeps running): most Wine mods' whole Wine session
     /// (this install's wineserver, which outlives the game when it restarts itself to update or for some settings), a
-    /// Mac mod's process as the catalogue gives it.
+    /// Mac mod's process as the catalogue gives it. Reach uses proc::mod_running instead to exclude EdgeUpdate.
     fn game_pattern(engine: &str) -> String {
         let Some(m) = mod_(engine) else { return "^$".into() };
         if m.on_wine() { return extended_regex_escaped(&format!("{}/wine/", paths::home().display())) + ".*/wineserver"; }
@@ -744,7 +744,12 @@ impl Library {
         if self.playing.is_none() || self.checking_crash || self.watch.is_some() { return; }
         let (tx, rx) = std::sync::mpsc::channel();
         let w = self.waker.clone();
-        proc::process_running(Self::game_pattern(&self.playing_engine), move |up| { let _ = tx.send(up); w(); });
+        let done = move |up| { let _ = tx.send(up); w(); };
+        if cfg!(target_os = "macos") && mod_(&self.playing_engine).is_some_and(|m| m.has("chromehoist")) {
+            proc::mod_running(self.playing_engine.clone(), done);
+        } else {
+            proc::process_running(Self::game_pattern(&self.playing_engine), done);
+        }
         self.watch = Some(rx);
     }
 
@@ -798,8 +803,8 @@ impl Library {
     }
 
     pub fn ask_restore_graphics(&mut self) {
-        self.dialog = Some(Dialog { title: "Restore Halo 3's recommended graphics?".into(),
-            message: "Your graphics settings are replaced; other settings stay.".into(),
+        self.dialog = Some(Dialog { title: "Restore recommended graphics?".into(),
+            message: "Replaces Halo 3's graphics settings and fills in missing Reach settings (60 fps, V-Sync). Other settings stay.".into(),
             buttons: vec![("Restore".into(), Act::RestoreGraphics), ("Cancel".into(), Act::Close)] });
     }
 
@@ -951,7 +956,7 @@ impl Library {
                 if ok { self.game_force_quit(); self.settings.say("The game was stopped.", true); }
                 else { self.settings.say(error_in(&last).unwrap_or_else(|| format!("The game couldn't be stopped. Restart your {COMPUTER} to close it.")), false); }
             }
-            Tool::ResetGraphics => say(&mut self.settings, "Done. Halo 3 uses them the next time it starts.".into(), "The graphics settings couldn't be changed."),
+            Tool::ResetGraphics => say(&mut self.settings, "Done. The settings apply the next time you play.".into(), "The graphics settings couldn't be changed."),
             Tool::ForgetSteam => {
                 if ok { self.settings.say("Done. The next download shows a QR code for the account you want.", true); }
                 else { self.settings.say("The Steam account couldn't be changed.", false); }

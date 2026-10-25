@@ -118,6 +118,17 @@ pub fn process_running(pattern: String, done: impl FnOnce(bool) + Send + 'static
     });
 }
 
+/// WebView2's background updater can keep Wine alive after Reach exits. Ask for the mod's actual processes,
+/// checked against this install's working folders, so another Reach install does not keep its tile playing.
+pub fn mod_running(engine: String, done: impl FnOnce(bool) + Send + 'static) {
+    std::thread::spawn(move || {
+        let out = Command::new(PYTHON).arg("-I").arg(paths::scripts_dir().join("tools.py"))
+            .args(["game-running", &engine]).env("DROPPOD_HOME", paths::home())
+            .stdin(Stdio::null()).stderr(Stdio::null()).output();
+        done(out.is_ok_and(|o| o.status.success() && o.stdout.trim_ascii() == b"running"));
+    });
+}
+
 /// Scripts' error output goes to logs/launcher.log for troubleshooting (appended: the window and the scripts write to
 /// it at the same time).
 pub fn log_file() -> Option<std::fs::File> {
