@@ -54,6 +54,7 @@ pub struct Mod {
     pub mcc_build: Option<String>, // the MCC build it needs ("current": whatever Steam has; it follows MCC's updates)
     pub runs: String,    // "wine": under Wine, in its own prefix; "mac": a Mac app of its own
     pub program: String, // its program's file name in mods/<id>/ (a regular expression)
+    pub folder: Option<String>, // the folder within mods/<id>/ its program is in, when its download has one
     pub process: String, // the running game as ps shows it (a regular expression)
     pub setup: String,   // "with-game": set up with its game (install.sh); "xbox-disc": from the player's disc
     pub extras: Option<Vec<String>>, // what install.sh adds for it: mesa, spinfix, loopback, presets
@@ -71,6 +72,12 @@ impl Mod {
     pub fn program(&self) -> &str {
         let here = if cfg!(windows) { &self.windows } else if cfg!(target_os = "linux") { &self.linux } else { &None };
         here.as_ref().map_or(&self.program, |p| &p.program)
+    }
+    /// Is its program in `mods`/<id>/ (or its folder within it), where mods.py puts and finds it?
+    pub fn program_there(&self, mods: &Path) -> bool {
+        let Ok(re) = regex::Regex::new(self.program()) else { return false };
+        std::fs::read_dir(mods.join(&self.id).join(self.folder.as_deref().unwrap_or(""))).map(|d| d.flatten()
+            .any(|e| re.is_match(&e.file_name().to_string_lossy()))).unwrap_or(false)
     }
     /// Every Windows mod runs under Wine on the Mac, so one that stops itself there doesn't run here.
     // (Windows runs it natively, so a mod that stops itself under Wine is fine there)
@@ -698,6 +705,15 @@ mod tests {
         assert_eq!(installed_games(&present_depots(&mcc)), ["halo3"], "Halo CE never counts as downloaded");
         assert!(looks_like_mcc(&mcc) && !looks_like_mcc(&tmp.0));
         assert!(installed_games(&[976733].into()).is_empty(), "nothing without the shared files");
+
+        // a mod's program, where mods.py unpacks it: Reach Renaissance's is inside its download's folder
+        let mods_dir = tmp.0.join("mods");
+        let reach = mod_("renaissance").unwrap();
+        fs::create_dir_all(mods_dir.join("renaissance/ReachRenaissance")).unwrap();
+        fs::write(mods_dir.join("renaissance/Reach Renaissance.exe"), b"").unwrap();
+        assert!(!reach.program_there(&mods_dir), "not beside its folder");
+        fs::write(mods_dir.join("renaissance/ReachRenaissance/Reach Renaissance.exe"), b"").unwrap();
+        assert!(reach.program_there(&mods_dir), "inside its folder");
 
         // the scripts read the same catalogue: games.py's list of the chosen games' mods
         let out = std::process::Command::new("/usr/bin/python3")

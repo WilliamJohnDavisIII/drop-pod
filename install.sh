@@ -100,7 +100,8 @@ wine_run() {  # wine_run <prefix> [--no-wait] <wine args...>: normally wait for 
   local pfx=$1 wait=1; shift
   if [ "${1:-}" = --no-wait ]; then wait=""; shift; fi
   if [ -n "$DRY" ]; then dry "WINEPREFIX=$pfx wine $*"; return 0; fi
-  WINEPREFIX="$pfx" WINEDEBUG=-all WINEDLLOVERRIDES="mscoree,mshtml=" "$WINE_BIN/wine" "$@" >/dev/null 2>&1 || true
+  # (not fd 3, the window's channel: a wineserver or EdgeUpdate left running would keep the window waiting)
+  WINEPREFIX="$pfx" WINEDEBUG=-all WINEDLLOVERRIDES="mscoree,mshtml=" "$WINE_BIN/wine" "$@" >/dev/null 2>&1 3>&- || true
   if [ -n "$wait" ]; then WINEPREFIX="$pfx" WINEDEBUG=-all "$WINE_BIN/wineserver" -w; fi
 }
 
