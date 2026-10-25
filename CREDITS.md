@@ -12,7 +12,7 @@ Drop Pod's full source code: https://github.com/WilliamJohnDavisIII/drop-pod
 |---|---|---|
 | **Drop Pod's window** (`launcher/`, in Rust) | GPL-3.0-or-later (`LICENSE`) | The parts ported from the Reclaimer Mac port's window stay MIT (marked in their files' headers). |
 | **Drop Pod's installer and scripts** (`install.sh`, `scripts/`, including `xiso.py`, written for it from the Xbox disc format) | GPL-3.0-or-later (`LICENSE`) | |
-| **The Rust crates and fonts the window is built from** (egui, eframe, wgpu, gilrs, rodio and the crates they use; Michroma and Titillium Web) | Each its own: MIT, Apache-2.0, MPL-2.0, Zlib, BSD, ISC; the fonts SIL OFL 1.1 | Every one, with its licence text, in `THIRD_PARTY_NOTICES`. |
+| **The Rust crates and fonts the window is built from** (egui, eframe, wgpu, gilrs, rodio, lewton and the crates they use; Michroma and Titillium Web) | Each its own: MIT, Apache-2.0, MPL-2.0, Zlib, BSD, ISC; the fonts SIL OFL 1.1 | Every one, with its licence text, in `THIRD_PARTY_NOTICES`. |
 | **Drop Pod's icon** (`assets/icon/`: `make_icon.py` and `tools/` draw it in code) | GPL-3.0-or-later (`LICENSE`) | Original geometry: no fonts, game art or traced shapes. |
 | **Project Reclaimer Mac Port** by Matt Romano, [mattromano/project-reclaimer-mac-port](https://github.com/mattromano/project-reclaimer-mac-port) | MIT (`LICENSE.reclaimer-mac-port`) | Drop Pod is forked from it: the window's code, `install.sh`, the updater, the Steam QR sign-in relay, the Tools/Settings scripts, the "Open Anyway" guide, the DMG scripts and the Halo 3 setup (run script, graphics presets, network addresses). |
 | **spinfix** `d3d11.dll` (from the Reclaimer Mac port, `spinfix/`) | MIT | Built from `spinfix/spinfix.c`; stops Halo 3's engine thread spinning a CPU core between frames. |
@@ -34,7 +34,7 @@ Drop Pod's full source code: https://github.com/WilliamJohnDavisIII/drop-pod
 
 **Halo: The Master Chief Collection** comes from your own Steam account (or an MCC folder you already have),
 under your own Steam licence. Drop Pod never includes or redistributes any of its files; it only shows MCC's own
-tile pictures from your game files folder. The same goes for your Halo: Combat Evolved Xbox disc, for native
+tile pictures and plays each game's menu music from your game files folder. The same goes for your Halo: Combat Evolved Xbox disc, for native
 Halo CE: Drop Pod reads the disc image you choose and never downloads or shares game data.
 
 Halo, Halo: The Master Chief Collection and related marks are trademarks of Microsoft. Steam is a trademark of

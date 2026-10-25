@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Title music: Halo CE's menu theme fades in when Drop Pod opens; moving to another game's tile crossfades to that
+  game's title music (Halo 2, Halo 3, Reach); Play fades it out, and the selected game's music comes back when the
+  game ends. Read from your own game files, like the tile pictures (MCC's menu music and Halo 3's own); nothing
+  plays without them. `DROPPOD_SOUNDS=0` turns it off with the menu sounds.
+
 ## 0.2.0 (2026-10-23)
 
 **Windows and Linux (experimental, untested)**

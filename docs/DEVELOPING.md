@@ -29,6 +29,7 @@ launcher/        the window, in Rust (egui on wgpu: Metal on macOS, Direct3D 12 
   src/screens.rs every screen and sheet        src/list.rs     the lists moved through by keys, mouse or controller
   src/ring.rs    the look (theme.rs: fonts and painting)   art.rs  MCC's tile pictures, read from the game files
   src/input.rs   keys and game controllers (gilrs)          sound.rs  the menu sounds, made in code (rodio)
+  src/music.rs   each game's title music, faded between tiles  mcc_audio.rs  reads it from the game files (lewton decodes)
   src/proc.rs    running the scripts            src/states.rs  --render-states and the "Open Anyway" picture
   assets/fonts/  Michroma and Titillium Web (OFL)           tests/  the QR sample the tests read
 APP_NAME         the app's name (the one place to change it)
