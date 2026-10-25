@@ -386,11 +386,8 @@ impl Library {
             self.files_found = folder.exists();
             if self.files_found { self.present = present_depots(&folder); }
         }
-        self.mods_there = mods().iter().filter(|m| {
-            let Ok(re) = regex::Regex::new(m.program()) else { return false };
-            std::fs::read_dir(paths::home().join("mods").join(&m.id)).map(|d| d.flatten()
-                .any(|e| re.is_match(&e.file_name().to_string_lossy()))).unwrap_or(false)
-        }).map(|m| m.id.clone()).collect();
+        let dir = paths::home().join("mods");
+        self.mods_there = mods().iter().filter(|m| m.program_there(&dir)).map(|m| m.id.clone()).collect();
         self.native_maps_there = paths::native_data_dir().join("maps/ui.map").exists();
     }
 
