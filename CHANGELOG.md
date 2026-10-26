@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 (2026-10-25)
 
 - Halo: Reach with Reach Renaissance on Apple Silicon Macs: Microsoft's Visual C++ and Edge WebView2 runtimes,
   MCC's own shader compiler, and the MIT chromehoist proxy that makes the WebView2 menus visible under Wine.
