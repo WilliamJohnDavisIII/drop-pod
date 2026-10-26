@@ -7,6 +7,9 @@
   Runtime downloads are pinned to direct Microsoft URLs and SHA-256 checksums.
 - Restore the menu fix before each launch when WebView2 has updated, and seed missing Reach graphics settings
   with a 60 fps cap and V-Sync, keeping the player's existing choices.
+- Reach's menus no longer float above other apps (they stack with the game's window), and Cmd-Q, the Dock's Quit and
+  the window's close button end the game, its menus and its browser whichever of them has the focus, so the tile no
+  longer stays on Playing.
 - Keep WebView2's background updater from stalling setup or leaving Reach's tile stuck on Playing after it exits.
 - Include Reach in setup, download sizes and the library. Linux support is enabled but untested; the Mac-specific
   runtime and menu fixes are installed only on macOS.

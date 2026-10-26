@@ -76,7 +76,8 @@ ZIG=/path/to/zig chromehoist/build.sh "/path/to/EdgeWebView/Application/<version
 
 Update `CHROMEHOIST_SHA` in `install.sh` with that build's checksum. The checked-in DLL is built with Zig 0.13;
 its PE timestamp may differ on a rebuild. The MIT source describes the window hoist, SetParent patch and command
-line changes. Menus remain a separate popup over the game window; the intro video is skipped under Wine.
+line changes. Menus remain a separate popup over the game window's contents, stacked with the game's windows rather
+than floating above other apps, and a quit sent to the menus is forwarded to the game; the intro video is skipped under Wine.
 
 Build and test (Xcode's command line tools and Rust from rustup; `launcher/rust-toolchain.toml` picks the version):
 
