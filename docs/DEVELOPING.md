@@ -39,12 +39,13 @@ scripts/         mods.json (the mod catalogue)  games.py (the catalogue's games 
                  (download a mod: latest release, checksum, resume, space check; how to start it)  steam.py
                  (DepotDownloader + QR relay)  updater.py (the app's own updates)  tools.py (Settings' and the guided
                  setups' commands)  xiso.py (Halo's maps out of an Xbox disc image)  presets.py (Project Reclaimer's
-                 graphics)  play.sh  run_wine.sh  game-launch.sh.in (the game app's executable)
+                 graphics and missing Reach defaults)  play.sh  run_wine.sh  game-launch.sh.in (the game app's executable)
                  droppod-loopback.sh + its plist
                  make_app.sh  make_dmg.sh  make_icon.sh
 tests/           test_scripts.py: xiso.py on made-up disc images, the catalogue (games.py, mods.py against a stand-in
                  for GitHub), crash-report cleanup, repair
 spinfix/         the Reclaimer port's d3d11.dll shim (source + pinned build)
+chromehoist/     the WebView2 menu fix for Reach on Mac (MIT source + pinned build; build.sh uses Zig)
 ```
 
 ### The mod catalogue
@@ -54,8 +55,29 @@ and the scripts read the same file. Per mod: `source` (a GitHub repo, the releas
 release's checksum file), `mb`, the MCC `depots` it needs and `mccBuild` ("current": it follows Steam's MCC), `runs`
 (`wine`, in `prefixes/<id>`, or `mac`), how it starts (`program` in `mods/<id>/`, `args`, `dllOverrides`, `env`), the
 `process` the library watches (for a Wine mod it watches the whole Wine session), `extras` install.sh adds (`mesa`,
-`spinfix`, `loopback`, `presets`), `setup` (`with-game`, or `xbox-disc` for the disc import), and the words its tile
+`spinfix`, `loopback`, `presets`, `msruntimes`, `chromehoist`), `setup` (`with-game`, or `xbox-disc` for the disc import), and the words its tile
 and guided setup use. A new Wine mod that needs nothing new is one entry here.
+
+On Mac, Reach's `msruntimes` extra installs the native Microsoft Visual C++ x64 and WebView2 runtimes into its
+own prefix and copies `d3dcompiler_47.dll` from the player's MCC CEF3 files. Game files are checked/downloaded
+before mod setup so that compiler is available on a first install. `chromehoist` preserves WebView2's original
+`msedge_elf.dll` as `msedge_elf_orig.dll` and installs our forwarding DLL in its version folder; `mods.py prepare`
+repeats the check before each launch, including after an Evergreen update. This is specific to Wine's Mac driver.
+The WebView2 installer leaves EdgeUpdate running: setup waits for the installer, then checks its files instead of
+waiting for the whole Wine session. Reach's library tile likewise watches its own game processes through
+`tools.py game-running renaissance`, with working folders checked to exclude separate installs.
+
+To update these runtimes, bump the direct Microsoft URL and SHA-256 together in `install.sh` (`VC_REDIST_PKG`,
+`WEBVIEW2_PKG`). Regenerate the proxy's exports from the new runtime and rebuild it:
+
+```sh
+ZIG=/path/to/zig chromehoist/build.sh "/path/to/EdgeWebView/Application/<version>/msedge_elf.dll"
+```
+
+Update `CHROMEHOIST_SHA` in `install.sh` with that build's checksum. The checked-in DLL is built with Zig 0.13;
+its PE timestamp may differ on a rebuild. The MIT source describes the window hoist, SetParent patch and command
+line changes. Menus remain a separate popup over the game window's contents, stacked with the game's windows rather
+than floating above other apps, and a quit sent to the menus is forwarded to the game; the intro video is skipped under Wine.
 
 Build and test (Xcode's command line tools and Rust from rustup; `launcher/rust-toolchain.toml` picks the version):
 

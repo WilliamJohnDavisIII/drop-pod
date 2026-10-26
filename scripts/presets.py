@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Write tuned Project Reclaimer (Halo 3) graphics settings, keeping every other setting.
+"""Write tuned Project Reclaimer (Halo 3) or Reach Renaissance graphics settings, keeping every other setting.
 From the Project Reclaimer Mac port (MIT); only the install folder differs.
 
-Usage: presets.py reclaimer
+Usage: presets.py reclaimer|renaissance
 
 Measured on an M2 Max at the main menu (uncapped):
   wine, borderless       ~95 fps  (DXVK rebuilds its swapchain every frame: the 1080p swapchain never
@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import games  # noqa: E402  (the app's folder)
 
 BASE = games.BASE
-PREFIXES = {"reclaimer": BASE / "prefixes" / "reclaimer"}
+PREFIXES = {m: BASE / "prefixes" / m for m in ("reclaimer", "renaissance")}
 # (window width, height, Reclaimer render_resolution) from largest to smallest
 WINDOW_SIZES = [(1920, 1080, "r1080p"), (1600, 900, "r900p"), (1280, 720, "r720p")]
 TITLE_BAR = 30  # points the window title bar takes (visibleFrame already excludes the menu bar and Dock)
@@ -44,12 +44,23 @@ def detail(level):
 def profile_dir(variant):
     """Reclaimer's profile lives in the prefix user's Documents\\My Games\\Project Reclaimer."""
     users = [u for u in (PREFIXES[variant] / "drive_c" / "users").iterdir() if u.name != "Public"]
-    return users[0] / "Documents" / "My Games" / "Project Reclaimer"
+    user = sorted(users)[0]
+    return user / ("AppData/Local/ReachRenaissance" if variant == "renaissance" else "Documents/My Games/Project Reclaimer")
 
 
 def main(variant):
     profile = profile_dir(variant)
     profile.mkdir(parents=True, exist_ok=True)
+    if variant == "renaissance":
+        path = profile / "settings.txt"
+        text = path.read_text() if path.exists() else ""
+        keys = {line.partition("=")[0] for line in text.splitlines() if "=" in line}
+        missing = [f"{key}={value}" for key, value in (("fps", "60"), ("vsync", "on")) if key not in keys]
+        if missing:
+            with path.open("a") as f:
+                f.write(("\n" if text and not text.endswith("\n") else "") + "\n".join(missing) + "\n")
+        print(f"{variant}: added {', '.join(missing) if missing else 'no settings (already set)'}")
+        return
     path = profile / "settings.json"
     settings = json.loads(path.read_text()) if path.exists() else {"version": 1}
     graphics = settings.setdefault("graphics", {})

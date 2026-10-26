@@ -1,6 +1,6 @@
 #!/bin/bash
 # make_app.sh [test|states <dir>]: build "dist/<name>.app" (arm64, macOS 14+) from launcher/ (Rust: egui on wgpu),
-# with install.sh, the scripts it installs, spinfix's d3d11.dll, the licences and the icon inside, ad-hoc signed.
+# with install.sh, the scripts it installs, spinfix and chromehoist, the licences and the icon inside, ad-hoc signed.
 #   test           run the tests instead: launcher's (cargo test) and tests/test_scripts.py
 #   states <dir>   also write a PNG of every window state into <dir> (the app's --render-states)
 # Needs Rust (rustup: launcher/rust-toolchain.toml picks the version). CARGO_TARGET_DIR moves the build folder.
@@ -26,7 +26,7 @@ RES="$APP/Contents/Resources"
 (cd launcher && "${CARGO[@]}" build --release --target aarch64-apple-darwin)
 TARGET=${CARGO_TARGET_DIR:-launcher/target}
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$RES/install/scripts" "$RES/install/spinfix"
+mkdir -p "$APP/Contents/MacOS" "$RES/install/scripts" "$RES/install/spinfix" "$RES/install/chromehoist"
 cp "$TARGET/aarch64-apple-darwin/release/droppod" "$APP/Contents/MacOS/DropPod"
 
 cp assets/icon/Droppod.icns "$RES/AppIcon.icns"  # (install.sh gives the game app the same icon)
@@ -38,6 +38,7 @@ for f in mods.json games.py mods.py steam.py updater.py tools.py presets.py xiso
   cp "scripts/$f" "$RES/install/scripts/$f"
 done
 cp spinfix/d3d11.dll "$RES/install/spinfix/d3d11.dll"
+cp chromehoist/msedge_elf.dll "$RES/install/chromehoist/msedge_elf.dll"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

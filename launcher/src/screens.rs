@@ -446,7 +446,7 @@ impl App {
         rows.push(tool("Force quit the game".into(), "Force Quit", "For a frozen game window that won't close, even with Force Quit.", Id::ForceQuit));
         let installed = l.installed();
         if games().iter().any(|g| installed.contains(&g.id) && mod_(&l.engine(&g.id)).is_some_and(|m| m.has("presets"))) {
-            rows.push(tool("Restore Halo 3's recommended graphics".into(), "Restore", "Puts back the graphics settings tuned for Macs (windowed, 60 fps). Quit the game first.", Id::Graphics));
+            rows.push(tool("Restore recommended graphics".into(), "Restore", "Restores Halo 3's tuned settings and fills in missing Reach settings (60 fps, V-Sync). Quit the game first.", Id::Graphics));
         }
         rows.push(tool("Use a different Steam account".into(), "Switch…", "Forgets the Steam account used for downloads; the next download shows a new QR code.", Id::Steam));
         rows.push(Row::Header("Logs".into()));
@@ -517,6 +517,12 @@ impl App {
             let t = if m.has("mesa") && m.has("spinfix") { "A graphics library its menus need (Mesa), and a fix that saves a CPU core" }
                     else if m.has("mesa") { "A graphics library its menus need (Mesa)" } else { "A fix that saves a CPU core" };
             rows.push(Row::Item { icon: Icon::Bullet, color: CYAN, text: t.into(), detail: String::new(), note: if m.has("mesa") { "70 MB".into() } else { String::new() } });
+        }
+        if m.has("msruntimes") && cfg!(target_os = "macos") {
+            rows.push(Row::Item { icon: Icon::Bullet, color: CYAN, text: "Microsoft's Visual C++ runtime, Edge WebView2 and shader compiler its menus need".into(), detail: String::new(), note: "240 MB".into() });
+        }
+        if m.has("chromehoist") && cfg!(target_os = "macos") {
+            rows.push(Row::Item { icon: Icon::Bullet, color: CYAN, text: "A fix that makes its menus show on a Mac".into(), detail: String::new(), note: String::new() });
         }
         for d in catalogue().depots.iter().filter(|d| m.depots.contains(&d.id)) {
             let there = l.present.contains(&d.id);
