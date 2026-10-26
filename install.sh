@@ -53,7 +53,7 @@ VC_REDIST_PKG="vc_redist.x64.exe|https://download.visualstudio.microsoft.com/dow
 WEBVIEW2_PKG="MicrosoftEdgeWebView2RuntimeInstallerX64.exe|https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/d6c50665-06a3-4ebe-8bde-7e408a78f093/MicrosoftEdgeWebView2RuntimeInstallerX64.exe|9b0142e22e8daa92855d746ae4d1e9eeef561ccaf67d1dd452165c4af3df3191"
 DXVK_DIR=dxvk-macOS-async-v1.10.3-20230507-repack
 SPINFIX_SHA=0ec56a555b7b420c381f7cf5010719c86c3626c3c99efcb376981089f5d4f847  # spinfix/d3d11.dll (built from spinfix/spinfix.c)
-CHROMEHOIST_SHA=2cae00421bfa39826c97a077213f13b9c4e435bb9c52390e4366c926d86f4bf1  # chromehoist/msedge_elf.dll
+CHROMEHOIST_SHA=727faaa3cade8352cb0303dd20df6d90d192576ab5bba606dd6c29234acee6e8  # chromehoist/msedge_elf.dll
 # give up on a stalled connection instead of hanging (the window waits for this)
 CURL_LIMITS="--connect-timeout 20 --speed-limit 1024 --speed-time 60"
 RUNTIME_GB=3  # Wine, the prefixes, the mods and the downloads while they unpack
