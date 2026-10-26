@@ -13,6 +13,8 @@ mod headless;
 mod input;
 mod library;
 mod list;
+mod mcc_audio;
+mod music;
 mod paths;
 mod proc;
 mod ring;
@@ -70,6 +72,8 @@ impl eframe::App for Window {
             ctx.send_viewport_cmd(egui::ViewportCommand::RequestUserAttention(egui::UserAttentionType::Critical));
         }
         self.qr_up = qr;
+        let (folder, game) = a.music();
+        music::want(folder.as_deref(), game);
         if std::mem::take(&mut a.lib.bring_to_front) { ctx.send_viewport_cmd(egui::ViewportCommand::Focus); }
         if a.lib.quit { a.allow_close = true; ctx.send_viewport_cmd(egui::ViewportCommand::Close); }
         if let Some(t) = [a.lib.wake_in(), a.setup.wake_in()].into_iter().flatten().reduce(f64::min) {

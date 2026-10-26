@@ -100,5 +100,5 @@ DepotDownloader, Project Reclaimer, Project Gravemind, Reach Renaissance and Chu
 [CREDITS.md](CREDITS.md).
 
 Halo and Halo: The Master Chief Collection are trademarks of Microsoft. Drop Pod is an unofficial fan project, not
-affiliated with Microsoft, 343 Industries, Halo Studios or Valve. It contains no game files; the pictures in the app
+affiliated with Microsoft, 343 Industries, Halo Studios or Valve. It contains no game files; the pictures and music in the app
 come from your own game files at run time, and these screenshots show it without them.

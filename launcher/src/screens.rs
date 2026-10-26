@@ -12,6 +12,7 @@ use crate::ring::*;
 use crate::setup::{Page, Setup, Source};
 use crate::sound::{self, Sound};
 use crate::theme::*;
+use std::path::PathBuf;
 use eframe::egui::{self, Align2, Color32, Pos2, Rect, Vec2};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -74,6 +75,25 @@ impl App {
         });
     }
 
+    /// The game files the art (and the music) come from.
+    fn game_files(&self) -> Option<PathBuf> {
+        match self.mode {
+            Mode::Setup => self.setup.existing_folder.clone().filter(|_| self.setup.folder_problem.is_none()),
+            Mode::Library => self.lib.game_files().filter(|_| self.lib.files_found),
+        }
+    }
+
+    /// Whose title music plays, and from where: Halo CE's on the main menu and in setup, the selected tile's in the
+    /// library, none while a game runs.
+    pub fn music(&self) -> (Option<PathBuf>, Option<&str>) {
+        let game = match (self.mode, self.screen) {
+            (Mode::Library, _) if self.lib.playing.is_some() => None,
+            (Mode::Library, Screen::Games) => games().get(self.game_sel).map(|g| g.id.as_str()),
+            _ => Some("halo1"),
+        };
+        (self.game_files(), game)
+    }
+
     /// One frame: the screen in `full` (the window), laid out on the canvas in its middle.
     pub fn frame(&mut self, ui: &mut egui::Ui, nav: Vec<Nav>) {
         let ctx = ui.ctx().clone();
@@ -82,10 +102,7 @@ impl App {
         let p = ui.painter().clone();
 
         // the art behind
-        let folder = match self.mode {
-            Mode::Setup => self.setup.existing_folder.clone().filter(|_| self.setup.folder_problem.is_none()),
-            Mode::Library => self.lib.game_files().filter(|_| self.lib.files_found),
-        };
+        let folder = self.game_files();
         self.art.set_folder(folder.as_deref());
         let behind = match (self.mode, self.screen) {
             (Mode::Library, Screen::Games) => games().get(self.game_sel).map_or(RING_ART.to_string(), |g| g.art.clone()),

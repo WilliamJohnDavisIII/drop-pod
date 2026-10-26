@@ -9,6 +9,7 @@ publish = false
 eframe = { version = "0.37", default-features = false, features = ["wgpu"] }
 gilrs = "0.11.2"
 image = { version = "0.25", default-features = false, features = ["png"] }
+lewton = "0.10.2"
 libc = "0.2.191"
 plist = "1.10.3"
 pollster = "0.4"
