@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.1 (2026-10-25)
 
 - Title music: Halo CE's menu theme fades in when Drop Pod opens; moving to another game's tile crossfades to that
   game's title music (Halo 2, Halo 3, Reach); Play fades it out, and the selected game's music comes back when the
