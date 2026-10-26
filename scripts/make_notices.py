@@ -17,7 +17,7 @@ LICENCE_FILES = ("license", "licence", "copying", "notice", "unlicense")
 def crates():
     out = subprocess.run([CARGO, "metadata", "--format-version", "1", "--locked", "--offline",
                           "--manifest-path", str(REPO / "launcher/Cargo.toml")],
-                         check=True, capture_output=True, text=True).stdout
+                         cwd=REPO / "launcher", check=True, capture_output=True, text=True).stdout
     meta = json.loads(out)
     root = meta["resolve"]["root"]
     nodes = {n["id"]: n for n in meta["resolve"]["nodes"]}
@@ -69,6 +69,9 @@ def main():
             "", "SPINFIX", "",
             "  spinfix/d3d11.dll, built from spinfix/spinfix.c: from the Project Reclaimer Mac port, MIT.",
             "    Copyright (c) 2026 Matt Romano (LICENSE.reclaimer-mac-port)",
+            "", "CHROMEHOIST", "",
+            "  chromehoist/msedge_elf.dll, built from chromehoist/chromehoist.c: MIT.",
+            "    Copyright (c) 2026 Devon Fuller",
             "", "", "LICENCE TEXTS", "",
             "Each text below once, with the crates that ship it.", ""]
     by_text = {}
@@ -78,6 +81,10 @@ def main():
     for t, users in sorted(by_text.values(), key=lambda v: v[1][0]):
         out += ["=" * 100, "Used by: " + ", ".join(users), "-" * 100, t, ""]
     fonts = REPO / "launcher/assets/fonts"
+    chromehoist = (REPO / "chromehoist/chromehoist.c").read_text()
+    mit = chromehoist[chromehoist.index(" * Copyright (c)"):chromehoist.index(" * Problem:")]
+    out += ["=" * 100, "chromehoist", "-" * 100,
+            "\n".join(line.removeprefix(" * ").removeprefix(" *").rstrip() for line in mit.splitlines()).strip(), ""]
     for name, f in [("Michroma", "OFL-Michroma.txt"), ("Titillium Web", "OFL-TitilliumWeb.txt")]:
         out += ["=" * 100, f"Font: {name}", "-" * 100, (fonts / f).read_text().strip(), ""]
     (REPO / "THIRD_PARTY_NOTICES").write_text("\n".join(out) + "\n")

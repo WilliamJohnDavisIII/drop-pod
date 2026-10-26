@@ -22,6 +22,7 @@ WINE=${DROPPOD_WINE:-$CONF_WINE}
 export WINESERVER=${WINESERVER:-${CONF_WINE:h}/wineserver}
 [ -x "$WINE" ] && [ -d "$WINEPREFIX" ] || {
   echo "run_wine.sh: @APP_NAME@ isn't fully set up ($CONFIG). Open @APP_NAME@ and use Settings > Repair." >&2; exit 1; }
+/usr/bin/python3 -I -B "$BASE/scripts/mods.py" prepare "$MOD" || exit 1
 # DXVK-macOS d3d11/d3d10core in every prefix's system32 (Wine's own D3D11 cannot create a device on MoltenVK).
 # For Project Reclaimer, d3d11.dll there is spinfix, which forwards to DXVK (d3d11_dxvk.dll) and makes Halo 3's engine
 # thread sleep instead of spinning on the clock between frames: about one CPU core less. RECLAIMER_SPINFIX_US=0 turns

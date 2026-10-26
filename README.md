@@ -22,7 +22,7 @@ project downloads from its own releases and keeps itself updated. Drop Pod never
 | Halo: Combat Evolved | **[ChupathingyCE](https://github.com/ChupathingyCE/chupathingyce)**, a native port of the Halo: CE decompilation for Windows, Mac, Linux (Steam Deck too) and Android: the campaign with online co-op, split-screen, System Link, and online games with a server browser |
 | Halo 2 | **[Project Gravemind](https://briroz1.github.io/project-gravemind/)**: co-op campaign for up to 6, multiplayer for up to 24 with matchmaking, ranked playlists, parties and a game browser, dedicated servers, split-screen, and Steam Workshop mods downloaded as you join |
 | Halo 3 and ODST | **[Project Reclaimer](https://github.com/ProjectReclaimer/project-reclaimer-releases)**, with its own menus: co-op campaign for up to 16 (up to 4 in split-screen on one computer), multiplayer for up to 128 with dedicated servers and a server browser, Forge, and ODST's Firefight |
-| Halo: Reach | **[Reach Renaissance](https://github.com/NETF1ix/reach-renaissance-releases)**, with the Xbox 360 menus: the campaign, Firefight, and multiplayer online or on your network through a public server list (Windows 10 or 11 only; it stops itself under Wine, so not on Mac or Linux) |
+| Halo: Reach | **[Reach Renaissance](https://github.com/NETF1ix/reach-renaissance-releases)**, with the Xbox 360 menus: the campaign, Firefight, and multiplayer online or on your network through a public server list. On Mac, Drop Pod installs the Microsoft runtimes and chromehoist menu fix it needs. |
 
 <p align="center"><img src="docs/screenshots/library.png" width="820" alt="Choosing a game in the library"></p>
 
@@ -41,7 +41,7 @@ Drop Pod was born on a Mac, because a Mac is all I have, so **macOS is the only 
 
 | | Status |
 |---|---|
-| **macOS** (Apple Silicon, macOS 14+) | Full guided setup. Halo 2 and 3 run under Wine Staging + DXVK + MoltenVK through Rosetta; Halo CE runs natively. |
+| **macOS** (Apple Silicon, macOS 14+) | Full guided setup. Halo 2, 3 and Reach run under Wine Staging + DXVK + MoltenVK through Rosetta; Halo CE runs natively. |
 | **Windows** | Guided setup (experimental, untested); needs Python 3. The mods run natively (Reach Renaissance included). |
 | **Linux** (incl. Steam Deck) | Guided setup (experimental, untested); needs Python 3. Halo CE runs natively; the Windows mods run under your system's Wine. |
 
@@ -53,7 +53,8 @@ Drop Pod was born on a Mac, because a Mac is all I have, so **macOS is the only 
   version), and the Steam app on your phone to scan a sign-in code.
 - **Halo CE:** a disc image (`.iso` or `.xiso`) of your own original Xbox disc, and about 2 GB free.
 - **Space:** about 3 GB for Drop Pod, plus the game files (an external drive works): 33 GB for Halo 3, 45 GB for
-  Halo 2 (65 GB with its multiplayer maps), 62 GB for both (they share 16 GB). An MCC folder you already have,
+  Halo 2 (65 GB with its multiplayer maps), 62 GB for both (they share 16 GB); Reach adds 16.4 GB, plus those
+  same shared 16 GB if you don't have them yet. An MCC folder you already have,
   even one copied from a Windows PC, works too: only what's missing is downloaded.
 - **On a Mac:** Apple Silicon (M1 or newer) on macOS 14 Sonoma or newer, and your password once (for Halo 3).
 
@@ -77,7 +78,7 @@ Drop Pod was born on a Mac, because a Mac is all I have, so **macOS is the only 
    tile offers to set it up again, showing each step.
 
 **Later:** **Get** on a tile downloads a game you skipped. **Settings** moves or repairs the game files, repairs Drop
-Pod, deletes crash reports (~3 GB each), force-quits a game, resets Halo 3's graphics, switches Steam account, shows
+Pod, deletes crash reports (~3 GB each), force-quits a game, restores recommended graphics, switches Steam account, shows
 logs, makes a report (a zip on your Desktop, without your Steam name), and uninstalls (your game files stay unless
 Drop Pod downloaded them into its own folder and you choose to delete them). Drop Pod updates itself from this repo's
 releases; each community project updates itself when it starts.

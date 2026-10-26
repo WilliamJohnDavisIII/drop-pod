@@ -16,7 +16,7 @@ mods.json, beside this file, is the one place the games and mods are listed; the
 game: its mods, the default first. Per mod: its games' depots, where it's downloaded from (a GitHub repo's latest
 release, checked against the release's checksum file, or GitHub's own SHA-256 when it has none), its size, how it
 runs (under Wine in its own prefix, or as a Mac app) and how it starts (program, arguments, DLL overrides,
-environment), what install.sh adds for it (extras: mesa, spinfix, loopback, presets), and how it's set up (with its
+environment), what install.sh adds for it (extras: mesa, spinfix, loopback, presets, msruntimes, chromehoist), and how it's set up (with its
 game, or from the player's Xbox disc). A Windows mod with notUnderWine stops itself under Wine, so it can't run here:
 a game with no other mod is left out of everything below (the window shows it with that message). mods.py downloads
 and starts mods. Depots are English only.
